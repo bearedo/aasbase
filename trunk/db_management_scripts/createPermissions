@@ -2,3 +2,9 @@
 
 psql -U postgres -d aas_base -c "CREATE USER dbeare WITH PASSWORD 'cum2brae';"
 psql -U postgres -d aas_base -c "GRANT ALL PRIVILEGES ON DATABASE aas_base to dbeare;"
+psql -U postgres -d aas_base -c "GRANT USAGE ON SCHEMA global TO dbeare;"
+
+psql -U postgres -d aas_base -c "select 'grant select on '||schemaname||'.'||tablename||' to dbeare;' from pg_tables where schemaname in ('global');"
+psql -U postgres -d aas_base -c "select 'grant select on '||schemaname||'."'||viewname||'" to dbeare;' from pg_views where schemaname in ('global');"
+psql -U postgres -d aas_base -c "select 'grant select on '||schemaname||'.'||tablename||' to dbeare;' from pg_tables where schemaname in ('public');"
+psql -U postgres -d aas_base -c "select 'grant select on '||schemaname||'."'||viewname||'"to dbeare;' from pg_views where schemaname in ('public');"
