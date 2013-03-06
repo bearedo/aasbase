@@ -1,0 +1,4 @@
+### File to create permissions and roles on aas_gis database
+
+psql -U postgres -d aas_base -c "CREATE USER dbeare WITH PASSWORD 'cum2brae';"
+psql -U postgres -d aas_base -c "GRANT ALL PRIVILEGES ON DATABASE aas_base to dbeare;"
