@@ -1,7 +1,6 @@
 #!/usr/bin/perl -w
 
-require "common.pl";
-#require "common-nrm-gis.pl";
+require "aas_db.pl";
 
 use strict;
 
@@ -16,14 +15,17 @@ use strict;
  
 print PSQL ("DROP TABLE global.geo_regions; \n");
 
+
+
+
 print PSQL ("CREATE TABLE global.geo_regions (
      numerical_code integer,
     country    varchar(72),
     region     varchar(72),
     continent  varchar(72)); \n");
 
-print PSQL ("COMMENT ON TABLE public.geo_regions IS 'These are United Nations Geographic regions from unstats.un.org/unsd/methods/m49/m49regin.htm ';\n"); 
-print PSQL ("\\COPY public.geo_regions FROM '/srv/public/input_data_files/UN-Groupings/UN-Geographic-Regions.csv' WITH DELIMITER '|' null as 'NA' CSV HEADER \n");
+print PSQL ("COMMENT ON TABLE global.geo_regions IS 'These are United Nations Geographic regions from unstats.un.org/unsd/methods/m49/m49regin.htm ';\n"); 
+print PSQL ("\\COPY global.geo_regions FROM '/srv/public/input_data_files/UN-Groupings/UN-Geographic-Regions.csv' WITH DELIMITER '|' null as 'NA' CSV HEADER \n");
 
 
 print PSQL ("DROP TABLE global.socioecon_groupings; \n");
@@ -45,6 +47,7 @@ print PSQL ("\\COPY global.socioecon_groupings FROM '/srv/public/input_data_file
 
 
 print PSQL ("SET SEARCH_PATH TO global;\n");
+#print PSQL ("SET NAMES TO 'LATIN1';\n");
 print PSQL ("DROP TABLE global.fish_capture CASCADE; \n");
 print PSQL ("CREATE TABLE global.fish_capture (
     
@@ -99,9 +102,9 @@ print PSQL ("CREATE TABLE global.aqua_value (
     source varchar(24)); \n");
 
 print PSQL ("COMMENT ON TABLE global.aqua_value IS 'These are FAO global fish aquaculture cash value statistics Afghanistan to Zim dumped from FISHSTATJ';\n"); 
-print PSQL ("COMMENT ON COLUMN global.aqua_alue.country IS 'Country';\n");
+print PSQL ("COMMENT ON COLUMN global.aqua_value.country IS 'Country';\n");
 print PSQL ("COMMENT ON COLUMN global.aqua_value.prodarea  IS 'FAO Aquaculture area';\n");
-print PSQL ("\\COPY fisheries.aquavalue FROM '/srv/public/input_data_files/FAOSTAT/Relational_Final.AquaVal2013.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY global.aqua_value FROM '/srv/public/input_data_files/FAOSTAT/Relational_Final.GAquaVal2013.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
 
 close(PSQL);
