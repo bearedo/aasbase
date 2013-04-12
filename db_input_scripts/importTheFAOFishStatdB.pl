@@ -86,7 +86,7 @@ print PSQL ("COMMENT ON COLUMN global.aqua_production.environment  IS 'FAO Aquac
 print PSQL ("\\COPY global.aqua_production FROM '/srv/public/input_data_files/FAOSTAT/Relational_Final.GAquaProd2013.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
 
-### Aquaculture value (cash)  ### 
+### Aquaculture value (cash)  ### #
 
 
 print PSQL ("SET SEARCH_PATH TO global;\n");
