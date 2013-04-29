@@ -1,7 +1,7 @@
 
 #!/usr/bin/perl -w
 
-require "common.mjradius.pl";
+require "aas_db.pl";
 ## require "common.pl";
 
 #use strict;
