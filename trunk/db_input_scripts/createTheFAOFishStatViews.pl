@@ -1,48 +1,48 @@
 
 #!/usr/bin/perl -w
 
-require "common.mjradius.pl";
+require "aas_db.pl";
 ## require "common.pl";
 
 #use strict;
 
-print PSQL ("SET SEARCH_PATH TO fisheries;\n");
+print PSQL ("SET SEARCH_PATH TO global;\n");
 
-print PSQL ("CREATE OR REPLACE VIEW GlobalFishProduction 
+print PSQL ("CREATE OR REPLACE VIEW fish_global_fish_production 
 AS 
-SELECT capture.country, capture.species, capture.fishingarea, capture.measure, 
-capture.year, sum(capture.quantity) AS landings_sum, count(capture.quantity) AS landings_count, 
-sum(aquaproduction.quantity) AS aquaproduction_sum, count(aquaproduction.quantity) AS aquaproduction_count
-FROM fisheries.capture, fisheries.aquaproduction
-GROUP BY capture.country, capture.species, capture.fishingarea, capture.measure, capture.year;
+SELECT fish_capture.country, fish_capture.species, fish_capture.prodarea, fish_capture.measure, 
+fish_capture.year, sum(fish_capture.quantity) AS landings_sum, count(fish_capture.quantity) AS landings_count, 
+sum(aqua_production.quantity) AS aqua_production_sum, count(aqua_production.quantity) AS aqua_production_count
+FROM global.fish_capture, global.aqua_production
+GROUP BY fish_capture.country, fish_capture.species, fish_capture.prodarea, fish_capture.measure, fish_capture.year;
  \n");
  
-print PSQL ("COMMENT ON VIEW GlobalFishProduction IS 'Landings and aquaculture production by species, year, country and fishing area';\n");
+print PSQL ("COMMENT ON VIEW fish_global_fish_production IS 'Capture and aquaculture production by species, year, country and fishing area for the globe from FAO time-series data';\n");
 
 
-print PSQL ("DROP VIEW  GlobalCaptureFishProductionByEconomicRegion CASCADE;\n");
+print PSQL ("DROP VIEW  fish_global_capture_production_by_economic_region CASCADE;\n");
 
-print PSQL ("CREATE VIEW GlobalCaptureFishProductionByEconomicRegion 
+print PSQL ("CREATE VIEW fish_global_capture_production_by_economic_region
   AS
   SELECT  
-  capture.species, 
-  capture.fishingarea, 
-  capture.measure, 
-  capture.year, 
-  capture.quantity, 
-  econgroupings.country, 
-  econgroupings.economic_status
+  fish_capture.species, 
+  fish_capture.prodarea, 
+  fish_capture.measure, 
+  fish_capture.year, 
+  fish_capture.quantity, 
+  socioecon_groupings.country, 
+  socioecon_groupings.economic_status
 FROM 
-  fisheries.capture, 
-  public.econgroupings
+  global.fish_capture, 
+  global.socioecon_groupings
 WHERE 
-  capture.measure = 'Quantity (tonnes)' AND capture.country = econgroupings.country 
+  fish_capture.measure = 'Quantity (tonnes)' AND fish_capture.country = socioecon_groupings.country 
 ORDER BY
-  capture.year ASC, 
-  capture.species ASC, 
-  capture.country ASC;            \n");
+  fish_capture.year ASC, 
+  fish_capture.species ASC, 
+  fish_capture.country ASC;            \n");
  
-print PSQL ("COMMENT ON VIEW GlobalCaptureFishProductionByEconomicRegion IS 'Landings by Economic Region';\n");
+print PSQL ("COMMENT ON VIEW fish_global_capture_production_by_economic_region IS 'Landings by Economic Region';\n");
 
 ###########################################################################################
 

@@ -1,8 +1,6 @@
 #!/usr/bin/perl -w
 
-require "common.pl";
-#require "common-nrm-gis.pl";
-
+require "aas_db.pl";
 
  use strict;
 
@@ -12,308 +10,262 @@ require "common.pl";
 ## THIS PROGRAM MUST BE RUN BY POSTGRES#
 ####################################
  
- ##PURPOSE: CREATE THE FAOSTAT DATABASE
+ ## PURPOSE: CREATE THE FAOSTAT DATABASE
 
  ## CREATE THE DATABASE AND SCHEMAS IN POSTGRESQL
 
-print PSQL ("CREATE DATABASE faostat;\n");
-print PSQL ("CREATE ROLE beare WITH LOGIN PASSWORD 'beare01'; \n");
-
-print PSQL ("CREATE ROLE tan WITH LOGIN PASSWORD 'tan01';\n");
-
-print PSQL ( "CREATE SCHEMA prodstat; \n");
-print PSQL ( "CREATE SCHEMA tradestat;\n");
-print PSQL ( "CREATE SCHEMA foodsupply;\n");
-print PSQL ( "CREATE SCHEMA foodbalance;\n");
-print PSQL ( "CREATE SCHEMA prices;\n");
-print PSQL ( "CREATE SCHEMA resources;\n");
-print PSQL ( "CREATE SCHEMA fisheries;\n");
-
-
-print PSQL ("DROP TABLE public.georegions; \n");
-
-print PSQL ("CREATE TABLE public.georegions (
-     numerical_code integer,
-    country    varchar(72),
-    region     varchar(72),
-    continent  varchar(72)); \n");
-
-print PSQL ("COMMENT ON TABLE public.georegions IS 'These are United Nations georegions from unstats.un.org/unsd/methods/m49/m49regin.htm ';\n"); 
-print PSQL ("\\COPY public.georegions FROM 'c:/bearedo/DataBase/FishStatData/UN-Geographic-Regions.csv' WITH DELIMITER '|' null as 'NA' CSV HEADER \n");
-
-
-print PSQL ("DROP TABLE public.econgroupings; \n");
-
-print PSQL ("CREATE TABLE public.econgroupings (
-     numerical_code integer,
-     country       varchar(72),
-     economic_status     varchar(72)); \n");
-
-print PSQL ("COMMENT ON TABLE public.econgroupings IS 'These are United Nations economic groupings from unstats.un.org/unsd/methods/m49/m49regin.htm ';\n"); 
-print PSQL ("\\COPY public.econgroupings FROM 'c:/bearedo/DataBase/FishStatData/UN-Economic-Groupings.csv' WITH DELIMITER '|' null as 'NA' CSV HEADER \n");
-
-
-print PSQL ("SET SEARCH_PATH TO prodstat;\n");
-
-print PSQL ("DROP TABLE prodstat.prodstat_crops; \n");
-
-print PSQL ("CREATE TABLE prodstat.prodstat_crops (
-    country_code        integer,
-    country       varchar(72),
-    item_code     varchar(12),
-    item         varchar(72),
-    element_code   integer,
-    element        varchar(24),
-    unit         varchar(12),
-    source_file  varchar(48),
-    year         integer,
-    quantity     float); \n");
-
-print PSQL ("COMMENT ON TABLE prodstat.prodstat_crops IS 'These are FAOSTAT crop production data Afghanistan to Zimbabwe from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
-print PSQL ("COMMENT ON COLUMN prodstat.prodstat_crops.unit IS 'Unit crop quantity is measured in';\n");
-print PSQL ("COMMENT ON COLUMN prodstat.prodstat_crops.source_file  IS 'Name of the bulk download file';\n");
-print PSQL ("\\COPY prodstat.prodstat_crops FROM 'c:/bearedo/DataBase/FAOSTAT/output/ProdSTAT-Crops1.csv' WITH DELIMITER '|' null as 'NA' CSV HEADER \n"); 
 
 ##################################################################################
 
+print PSQL ("SET SEARCH_PATH TO global; \n");
 
-print PSQL ("DROP TABLE prodstat.prodstat_crops_processed; \n");
+print PSQL ("DROP TABLE agri_prodstat_crops_processed; \n");
 
-print PSQL ("CREATE TABLE prodstat.prodstat_crops_processed (
+print PSQL ("CREATE TABLE agri_prodstat_crops_processed (
     country_code        integer,
     country       varchar(72),
     item_code     varchar(12),
     item         varchar(72),
-    element_code   integer,
-    element        varchar(24),
-    unit         varchar(12),
-    source_file  varchar(48),
+    element_group   integer,
+    element_code       varchar(24),
+    element      varchar(24),
     year         integer,
-    quantity     float); \n");
+    unit  varchar(12),
+    quantity     float,
+    flag     varchar(12)); \n");
 
-print PSQL ("COMMENT ON TABLE prodstat.prodstat_crops_processed IS 'These are FAOSTAT processed crop production data Afghanistan to Zimbabwe from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
-print PSQL ("COMMENT ON COLUMN prodstat.prodstat_crops_processed.unit IS 'Unit crop quantity is measured in';\n");
-print PSQL ("COMMENT ON COLUMN prodstat.prodstat_crops_processed.source_file  IS 'Name of the bulk download file';\n");
-print PSQL ("\\COPY prodstat.prodstat_crops_processed FROM 'c:/bearedo/DataBase/FAOSTAT/output/ProdSTAT-Crops Processed1.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
-
-# Add on UN georegions and economic groupings
-
-print PSQL ("ALTER TABLE prodstat.prodstat_crops_processed ADD COLUMN region varchar(36);\n");
-print PSQL ("UPDATE prodstat.prodstat_crops_processed 
-SET region = public.georegions.region
-FROM public.georegions
-WHERE prodstat.prodstat_crops_processed.country = public.georegions.country;  \n");
-
-
-print PSQL ("ALTER TABLE prodstat.prodstat_crops_processed ADD COLUMN continent varchar(36);\n");
-print PSQL ("UPDATE prodstat.prodstat_crops_processed 
-SET continent = public.georegions.continent
-FROM public.georegions
-WHERE prodstat.prodstat_crops_processed.country = public.georegions.country;  \n");
-
-
-print PSQL ("ALTER TABLE prodstat.prodstat_crops_processed ADD COLUMN economic_status varchar(36);\n");
-print PSQL ("UPDATE prodstat.prodstat_crops_processed 
-SET economic_status = public.econgroupings.economic_status
-FROM public.econgroupings
-WHERE prodstat.prodstat_crops_processed.country = public.econgroupings.country;  \n");
-
-
-
- #################################################################################
-
-
-print PSQL ("DROP TABLE prodstat.prodstat_livestock; \n");
-
-print PSQL ("CREATE TABLE prodstat.prodstat_livestock (
-    country_code        integer,
-    country       varchar(72),
-    item_code     varchar(12),
-    item         varchar(72),
-    element_code   integer,
-    element        varchar(24),
-    unit         varchar(12),
-    source_file  varchar(48),
-    year         integer,
-    quantity     float); \n");
-
-print PSQL ("COMMENT ON TABLE prodstat.prodstat_livestock IS 'These are FAOSTAT processed crop production data Afghanistan to Zimbabwe from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
-print PSQL ("COMMENT ON COLUMN prodstat.prodstat_livestock.unit IS 'Unit crop quantity is measured in';\n");
-print PSQL ("COMMENT ON COLUMN prodstat.prodstat_livestock.source_file  IS 'Name of the bulk download file';\n");
-print PSQL ("\\COPY prodstat.prodstat_livestock FROM 'c:/bearedo/DataBase/FAOSTAT/output/ProdSTAT-LiveStock1.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
-
-
-#################################################################################
-
-
-print PSQL ("DROP TABLE prodstat.prodstat_livestock_primary; \n");
-
-print PSQL ("CREATE TABLE prodstat.prodstat_livestock_primary (
-    country_code        integer,
-    country       varchar(72),
-    item_code     varchar(12),
-    item         varchar(72),
-    element_code   integer,
-    element        varchar(48),
-    unit         varchar(12),
-    source_file  varchar(48),
-    year         integer,
-    quantity     float); \n");
-
-print PSQL ("COMMENT ON TABLE prodstat.prodstat_livestock_primary IS 'These are FAOSTAT processed crop production data Afghanistan to Zimbabwe from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
-print PSQL ("COMMENT ON COLUMN prodstat.prodstat_livestock_primary.unit IS 'Unit crop quantity is measured in';\n");
-print PSQL ("COMMENT ON COLUMN prodstat.prodstat_livestock_primary.source_file  IS 'Name of the bulk download file';\n");
-print PSQL ("\\COPY prodstat.prodstat_livestock_primary FROM 'c:/bearedo/DataBase/FAOSTAT/output/ProdSTAT-LivestockPrimary1.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("COMMENT ON TABLE agri_prodstat_crops_processed IS 'These are FAOSTAT processed crop production data Afghanistan to Zimbabwe from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_prodstat_crops_processed.unit IS 'Unit crop quantity is measured in';\n");
+print PSQL ("\\COPY agri_prodstat_crops_processed FROM '/srv/public/input_data_files/FAOSTAT/tmp/production-cropsprocessed7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
 
 # Add on UN georegions and economic groupings
 
-print PSQL ("ALTER TABLE prodstat.prodstat_livestock_primary ADD COLUMN region varchar(36);\n");
-print PSQL ("UPDATE prodstat.prodstat_livestock_primary 
-SET region = public.georegions.region
-FROM public.georegions
-WHERE prodstat.prodstat_livestock_primary.country = public.georegions.country;  \n");
+print PSQL ("ALTER TABLE agri_prodstat_crops_processed ADD COLUMN region varchar(36);\n");
+print PSQL ("UPDATE agri_prodstat_crops_processed 
+SET region = geo_regions.region
+FROM geo_regions
+WHERE agri_prodstat_crops_processed.country = geo_regions.country;  \n");
 
 
-print PSQL ("ALTER TABLE prodstat.prodstat_livestock_primary ADD COLUMN continent varchar(36);\n");
-print PSQL ("UPDATE prodstat.prodstat_livestock_primary 
-SET continent = public.georegions.continent
-FROM public.georegions
-WHERE prodstat.prodstat_livestock_primary.country = public.georegions.country;  \n");
+print PSQL ("ALTER TABLE agri_prodstat_crops_processed ADD COLUMN continent varchar(36);\n");
+print PSQL ("UPDATE agri_prodstat_crops_processed 
+SET continent = geo_regions.continent
+FROM geo_regions
+WHERE agri_prodstat_crops_processed.country = geo_regions.country;  \n");
 
 
-print PSQL ("ALTER TABLE prodstat.prodstat_livestock_primary ADD COLUMN economic_status varchar(36);\n");
-print PSQL ("UPDATE prodstat.prodstat_livestock_primary 
-SET economic_status = public.econgroupings.economic_status
-FROM public.econgroupings
-WHERE prodstat.prodstat_livestock_primary.country = public.econgroupings.country;  \n");
+print PSQL ("ALTER TABLE agri_prodstat_crops_processed ADD COLUMN economic_status varchar(36);\n");
+print PSQL ("UPDATE agri_prodstat_crops_processed 
+SET economic_status = socioecon_groupings.economic_status
+FROM socioecon_groupings
+WHERE agri_prodstat_crops_processed.country = socioecon_groupings.country;  \n");
 
+#################################################################################
+
+#######LIVESTOCK ######################
+
+
+print PSQL ("DROP TABLE agri_prodstat_livestock; \n");
+
+print PSQL ("CREATE TABLE agri_prodstat_livestock (
+    country_code        integer,
+    country       varchar(72),
+    item_code     varchar(12),
+    item         varchar(72),
+    element_group integer,
+    element_code   integer,
+    element        varchar(24),
+    year         integer,
+    unit         varchar(12),
+    quantity     float,
+    flag         varchar(12)); \n");
+
+print PSQL ("COMMENT ON TABLE agri_prodstat_livestock IS 'These are FAOSTAT livestock data Afghanistan to Zimbabwe from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_prodstat_livestock.unit IS 'Unit crop quantity is measured in';\n");
+print PSQL ("\\COPY agri_prodstat_livestock FROM '/srv/public/input_data_files/FAOSTAT/tmp/production-livestock7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
 
 #################################################################################
 
+#######LIVESTOCK ######################
 
-print PSQL ("DROP TABLE prodstat.prodstat_livestock_processed; \n");
 
-print PSQL ("CREATE TABLE prodstat.prodstat_livestock_processed (
+print PSQL ("DROP TABLE agri_prodstat_livestock_primary; \n");
+
+print PSQL ("CREATE TABLE agri_prodstat_livestock_primary (
     country_code        integer,
     country       varchar(72),
     item_code     varchar(12),
     item         varchar(72),
+    element_group integer,
     element_code   integer,
     element        varchar(48),
-    unit         varchar(12),
-    source_file  varchar(48),
     year         integer,
-    quantity     float); \n");
+    unit         varchar(12),
+    quantity     float,
+    flag varchar(12)); \n");
 
-print PSQL ("COMMENT ON TABLE prodstat.prodstat_livestock_processed IS 'These are FAOSTAT processed crop production data Afghanistan to Zimbabwe from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
-print PSQL ("COMMENT ON COLUMN prodstat.prodstat_livestock_processed.unit IS 'Unit crop quantity is measured in';\n");
-print PSQL ("COMMENT ON COLUMN prodstat.prodstat_livestock_processed.source_file  IS 'Name of the bulk download file';\n");
-print PSQL ("\\COPY prodstat.prodstat_livestock_processed FROM 'c:/bearedo/DataBase/FAOSTAT/output/ProdSTAT-LivestockProcessed1.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("COMMENT ON TABLE agri_prodstat_livestock_primary IS 'These are FAOSTAT primary livestock data Afghanistan to Zimbabwe from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_prodstat_livestock_primary.unit IS 'Unit crop quantity is measured in';\n");
+print PSQL ("\\COPY agri_prodstat_livestock_primary FROM '/srv/public/input_data_files/FAOSTAT/tmp/production-livestockprimary7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+
+
+# Add on UN georegions and economic groupings
+
+print PSQL ("ALTER TABLE agri_prodstat_livestock_primary ADD COLUMN region varchar(36);\n");
+print PSQL ("UPDATE agri_prodstat_livestock_primary 
+SET region = geo_regions.region
+FROM geo_regions
+WHERE agri_prodstat_livestock_primary.country = geo_regions.country;  \n");
+
+
+print PSQL ("ALTER TABLE agri_prodstat_livestock_primary ADD COLUMN continent varchar(36);\n");
+print PSQL ("UPDATE agri_prodstat_livestock_primary 
+SET continent = geo_regions.continent
+FROM geo_regions
+WHERE agri_prodstat_livestock_primary.country = geo_regions.country;  \n");
+
+
+print PSQL ("ALTER TABLE agri_prodstat_livestock_primary ADD COLUMN economic_status varchar(36);\n");
+print PSQL ("UPDATE agri_prodstat_livestock_primary 
+SET economic_status = socioecon_groupings.economic_status
+FROM socioecon_groupings
+WHERE agri_prodstat_livestock_primary.country = socioecon_groupings.country;  \n");
+
+
+
+#################################################################################
+############Livestock processed##################################################
+#################################################################################
+
+
+print PSQL ("DROP TABLE agri_prodstat_livestock_processed; \n");
+
+print PSQL ("CREATE TABLE agri_prodstat_livestock_processed (
+    country_code        integer,
+    country       varchar(72),
+    item_code     varchar(12),
+    item         varchar(72),
+    element_group integer,
+    element_code   integer,
+    element        varchar(48),
+    year         integer,
+    unit         varchar(12),
+    quantity     float,
+    flag  varchar(12)); \n");
+
+print PSQL ("COMMENT ON TABLE agri_prodstat_livestock_processed IS 'These are FAOSTAT processed livestock data Afghanistan to Zimbabwe from http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_prodstat_livestock_processed.unit IS 'Unit livestock quantity is measured in';\n");
+print PSQL ("\\COPY agri_prodstat_livestock_processed FROM '/srv/public/input_data_files/FAOSTAT/tmp/production-livestockprocessed7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
 
 ##################################################################################
 
 
-print PSQL ("DROP TABLE prodstat.prodstat_value; \n");
+print PSQL ("DROP TABLE agri_prodstat_value; \n");
 
-print PSQL ("CREATE TABLE prodstat.prodstat_value (
+print PSQL ("CREATE TABLE agri_prodstat_value (
     country_code        integer,
     country       varchar(72),
-    tem_code     varchar(12),
+    item_code     varchar(72),
     item         varchar(72),
+    element_group integer,
     element_code   integer,
-    element        varchar(72),
-    unit         varchar(12),
-    source_file  varchar(48),
+    element        varchar(144),
+    unit         varchar(72),
     year         integer,
     quantity     float); \n");
 
-print PSQL ("COMMENT ON TABLE prodstat.prodstat_value IS 'These are FAOSTAT value of production data Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
-print PSQL ("COMMENT ON COLUMN prodstat.prodstat_value.unit IS 'Unit crop quantity is measured in';\n");
-print PSQL ("COMMENT ON COLUMN prodstat.prodstat_value.source_file  IS 'Name of the bulk download file';\n");
-print PSQL ("\\COPY prodstat.prodstat_value FROM 'c:/bearedo/DataBase/FAOSTAT/output/Value of Production1.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
-print PSQL ("\\COPY prodstat.prodstat_value FROM 'c:/bearedo/DataBase/FAOSTAT/output/Value of Production2.csv' WITH DELIMITER '|' null as 'NA' CSV  \n"); 
+print PSQL ("COMMENT ON TABLE agri_prodstat_value IS 'FAOSTAT value of production data Afghan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_prodstat_value.unit IS 'Unit crop quantity is measured in';\n");
+print PSQL ("\\COPY agri_prodstat_value FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_value_of_production1.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_prodstat_value FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_value_of_production2.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_prodstat_value FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_value_of_production3.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_prodstat_value FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_value_of_production4.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_prodstat_value FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_value_of_production5.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_prodstat_value FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_value_of_production6.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
 
 ##################################################################################
 
 
-print PSQL ("DROP TABLE prodstat.pins; \n");
+print PSQL ("DROP TABLE agri_pins; \n");
 
-print PSQL ("CREATE TABLE prodstat.pins (
-    country_code        integer,
+print PSQL ("CREATE TABLE agri_pins (
+  country_code        integer,
     country       varchar(72),
-    item_code     varchar(12),
+    item_code     integer,
     item         varchar(72),
+    element_group integer,
     element_code   integer,
-    element        varchar(72),
-    unit         varchar(12),
-    source_file  varchar(48),
-    year         integer,
-    quantity     float); \n");
+    element        varchar(144),
+    year          integer,
+    unit         varchar(72),
+    quantity     float,
+    flag  varchar(2));\n");
 
-print PSQL ("COMMENT ON TABLE prodstat.pins IS 'These are FAOSTAT value of production data Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
-print PSQL ("COMMENT ON COLUMN prodstat.pins.unit IS 'Unit crop quantity is measured in';\n");
-print PSQL ("COMMENT ON COLUMN prodstat.pins.source_file  IS 'Name of the bulk download file';\n");
-print PSQL ("\\COPY prodstat.pins FROM 'c:/bearedo/DataBase/FAOSTAT/output/PINS1.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("COMMENT ON TABLE agri_pins IS 'FAOSTAT Production Index Numbers data Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_pins.unit IS 'Unit quantity is measured in';\n");
+print PSQL ("\\COPY agri_pins FROM '/srv/public/input_data_files/FAOSTAT/tmp/pins7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
 
 ############################################################################################################
-#######FILL TRADESTAT SCHEMA #############################
+#######FILL Trade Statistics data #############################
 ############################################################################################################
 
+print PSQL ("DROP TABLE agri_trade_crops_livestockproducts; \n");
 
-print PSQL ("SET SEARCH_PATH TO tradestat;\n");
-
-print PSQL ("DROP TABLE tradestat.crops_livestockproducts; \n");
-
-print PSQL ("CREATE TABLE tradestat.crops_livestockproducts (
+print PSQL ("CREATE TABLE agri_trade_crops_livestockproducts (
+   
     country_code        integer,
     country       varchar(72),
-    item_code     varchar(12),
+    item_code     integer,
     item         varchar(72),
+    element_group integer,
     element_code   integer,
-    element        varchar(72),
-    unit         varchar(12),
-    source_file  varchar(48),
-    year         integer,
+    element        varchar(144),
+    unit         varchar(36),
+    year          integer,
     quantity     float); \n");
 
-print PSQL ("COMMENT ON TABLE tradestat.crops_livestockproducts IS 'These are FAOSTAT value of trade statistics data Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
-print PSQL ("COMMENT ON COLUMN tradestat.crops_livestockproducts.unit IS 'Unit crop quantity is measured in';\n");
-print PSQL ("COMMENT ON COLUMN tradestat.crops_livestockproducts.source_file  IS 'Name of the bulk download file';\n");
-print PSQL ("\\COPY tradestat.crops_livestockproducts FROM 'c:/bearedo/DataBase/FAOSTAT/output/TradeSTAT-Crops&LiveStockProducts1.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
-print PSQL ("\\COPY tradestat.crops_livestockproducts FROM 'c:/bearedo/DataBase/FAOSTAT/output/TradeSTAT-Crops&LiveStockProducts2.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
-print PSQL ("\\COPY tradestat.crops_livestockproducts FROM 'c:/bearedo/DataBase/FAOSTAT/output/TradeSTAT-Crops&LiveStockProducts3.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
-print PSQL ("\\COPY tradestat.crops_livestockproducts FROM 'c:/bearedo/DataBase/FAOSTAT/output/TradeSTAT-Crops&LiveStockProducts4.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
-print PSQL ("\\COPY tradestat.crops_livestockproducts FROM 'c:/bearedo/DataBase/FAOSTAT/output/TradeSTAT-Crops&LiveStockProducts5.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
-print PSQL ("\\COPY tradestat.crops_livestockproducts FROM 'c:/bearedo/DataBase/FAOSTAT/output/TradeSTAT-Crops&LiveStockProducts6.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
-#
+print PSQL ("COMMENT ON TABLE agri_trade_crops_livestockproducts IS 'These are FAOSTAT value of trade statistics data Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_trade_crops_livestockproducts.unit IS 'Unit crop quantity is measured in';\n");
+print PSQL ("\\COPY agri_trade_crops_livestockproducts FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_trade-cropslivestockproducts1.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_trade_crops_livestockproducts FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_trade-cropslivestockproducts2.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_trade_crops_livestockproducts FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_trade-cropslivestockproducts3.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_trade_crops_livestockproducts FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_trade-cropslivestockproducts4.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_trade_crops_livestockproducts FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_trade-cropslivestockproducts5.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_trade_crops_livestockproducts FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_trade-cropslivestockproducts6.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_trade_crops_livestockproducts FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_trade-cropslivestockproducts7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_trade_crops_livestockproducts FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_trade-cropslivestockproducts8.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+
+
+
 #######################################################################
 
-print PSQL ("DROP TABLE tradestat.live_animals; \n");
+print PSQL ("DROP TABLE agri_trade_liveanimals; \n");
 
-print PSQL ("CREATE TABLE tradestat.live_animals (
+print PSQL ("CREATE TABLE agri_trade_liveanimals (
     country_code        integer,
     country       varchar(72),
-    item_code     varchar(12),
+    item_code     integer,
     item         varchar(72),
+    element_group integer,
     element_code   integer,
-    element        varchar(72),
-    unit         varchar(12),
-    source_file  varchar(48),
+    element        varchar(144),
     year         integer,
-    quantity     float); \n");
+    unit         varchar(36),
+    quantity     float,
+    flag     varchar(2));
 
-print PSQL ("COMMENT ON TABLE tradestat.live_animals IS 'These are FAOSTAT value of trade statistics data Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
-print PSQL ("COMMENT ON COLUMN tradestat.live_animals.unit IS 'Unit crop quantity is measured in';\n");
-print PSQL ("COMMENT ON COLUMN tradestat.live_animals.source_file  IS 'Name of the bulk download file';\n");
+ \n");
 
-print PSQL ("\\COPY tradestat.live_animals FROM 'c:/bearedo/DataBase/FAOSTAT/output/TradeSTAT-LiveAnimals1.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("COMMENT ON TABLE agri_trade_liveanimals IS 'FAOSTAT cash value of live animals Afghan to Zim from http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_trade_liveanimals.unit IS 'Unit cash value is measured in';\n");
+print PSQL ("\\COPY agri_trade_liveanimals FROM '/srv/public/input_data_files/FAOSTAT/tmp/trade-liveanimals7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
-
+#############Trade index ###############
 
 print PSQL ("DROP TABLE tradestat.trade_index; \n");
 
@@ -618,69 +570,6 @@ print PSQL ("COMMENT ON COLUMN resources.economics.source_file  IS 'Name of the 
 print PSQL ("\\COPY resources.economics FROM 'c:/bearedo/DataBase/FAOSTAT/output/EconSTAT - Capital Stock1.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
 
-
-############################################################################################################
-#######FILL FISHERIES SCHEMA #############################
-############################################################################################################
-
-## Capture fisheries ###
-
-
-print PSQL ("SET SEARCH_PATH TO fisheries;\n");
-print PSQL ("DROP TABLE fisheries.capture CASCADE; \n");
-print PSQL ("CREATE TABLE fisheries.capture (
-    
-    country       varchar(72),
-    species     varchar(36),
-    fishingarea         varchar(72),
-    measure   varchar(24),
-    year         integer,
-    quantity     float); \n");
-
-print PSQL ("COMMENT ON TABLE fisheries.capture IS 'These are FAO global fish capture statistics Afghanistan to Zim dumped from FISHSTATJ';\n"); 
-print PSQL ("COMMENT ON COLUMN fisheries.capture.country IS 'Country';\n");
-print PSQL ("COMMENT ON COLUMN fisheries.capture.fishingarea  IS 'Fishing area';\n");
-print PSQL ("\\COPY fisheries.capture FROM 'c:/bearedo/DataBase/FAOSTAT/output/GlobalCaptureProduction.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
-
-
-# Aquaculture production ### 
-
-
-print PSQL ("SET SEARCH_PATH TO fisheries;\n");
-print PSQL ("DROP TABLE fisheries.aquaproduction CASCADE; \n");
-print PSQL ("CREATE TABLE fisheries.aquaproduction (
-    
-    country       varchar(72),
-    species     varchar(36),
-    fishingarea         varchar(72),
-    environment   varchar(24),
-    year         integer,
-    quantity     float); \n");
-
-print PSQL ("COMMENT ON TABLE fisheries.aquaproduction IS 'These are FAO global fish aquaculture production statistics Afghanistan to Zim dumped from FISHSTATJ';\n"); 
-print PSQL ("COMMENT ON COLUMN fisheries.aquaproduction.country IS 'Country';\n");
-print PSQL ("COMMENT ON COLUMN fisheries.aquaproduction.fishingarea  IS 'Fishing area';\n");
-print PSQL ("\\COPY fisheries.aquaproduction FROM 'c:/bearedo/DataBase/FAOSTAT/output/GlobalAquaProduction.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
-
-
-# Aquaculture value (cash)  ### 
-
-
-print PSQL ("SET SEARCH_PATH TO fisheries;\n");
-print PSQL ("DROP TABLE fisheries.aquavalue CASCADE; \n");
-print PSQL ("CREATE TABLE fisheries.aquavalue (
-    
-    country       varchar(72),
-    species     varchar(36),
-    fishingarea         varchar(72),
-    environment   varchar(24),
-    year         integer,
-    quantity     float); \n");
-
-print PSQL ("COMMENT ON TABLE fisheries.aquavalue IS 'These are FAO global fish aquaculture cash value statistics Afghanistan to Zim dumped from FISHSTATJ';\n"); 
-print PSQL ("COMMENT ON COLUMN fisheries.aquavalue.country IS 'Country';\n");
-print PSQL ("COMMENT ON COLUMN fisheries.aquavalue.fishingarea  IS 'Fishing area';\n");
-print PSQL ("\\COPY fisheries.aquavalue FROM 'c:/bearedo/DataBase/FAOSTAT/output/GlobalAquaValue.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
 
 

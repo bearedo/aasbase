@@ -15,9 +15,6 @@ use strict;
  
 print PSQL ("DROP TABLE global.geo_regions; \n");
 
-
-
-
 print PSQL ("CREATE TABLE global.geo_regions (
      numerical_code integer,
     country    varchar(72),
