@@ -161,6 +161,11 @@ print PSQL ("ALTER TABLE global.precipitation ADD COLUMN the_point geometry(Poin
 print PSQL ("UPDATE global.precipitation SET the_point = ST_SETSRID(ST_MAKEPOINT(lon,lat),4326);\n"); 
 
 print PSQL ("CREATE INDEX precipitation_the_point ON global.precipitation USING GIST (the_point);\n");
+
+print PSQL ("ALTER TABLE global.precipitation  ADD COLUMN iso_3digit varchar(24);\n");
+print PSQL ("UPDATE global.precipitation SET iso_3digit = geo_worldeez.iso_3digit FROM geo_worldeez WHERE ST_Intersects(precipitation.the_point,geo_worldeez.the_geom_4326);\n");
+##
+
 ##
 ##
 ##### Split into decadal tables to make data easier to deal with
