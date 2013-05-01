@@ -134,14 +134,16 @@ close(DATAFILE);
 
 print PSQL ("DROP TABLE global.precipitation_tropics CASCADE; \n");
 
+## Smaller manageable table for tropics
 
 print PSQL ("SELECT * INTO global.precipitation_tropics from global.precipitation where lat > -19 AND lat < 27;\n");
 print PSQL ("COMMENT ON TABLE global.precipitation_tropics IS 'These are global land precipitation data from GHCN for key tropical countries only';\n");
-
+print PSQL ("ALTER TABLE global.precipitation_tropics ADD COLUMN the_point geometry(Point,4326);\n");
+print PSQL ("UPDATE global.precipitation_tropics SET the_point = ST_SETSRID(ST_MAKEPOINT(lon,lat),4326);\n"); 
 
 
 print PSQL ("ALTER TABLE global.precipitation_tropics ADD PRIMARY KEY (year,month,lat,lon);\n");
-
+print PSQL ("CREATE INDEX precipitation_tropics_the_point ON global.precipitation_tropics USING GIST (the_point);\n");
 
 #
 ### Create indices ###
@@ -162,9 +164,19 @@ print PSQL ("UPDATE global.precipitation SET the_point = ST_SETSRID(ST_MAKEPOINT
 
 print PSQL ("CREATE INDEX precipitation_the_point ON global.precipitation USING GIST (the_point);\n");
 
-print PSQL ("ALTER TABLE global.precipitation  ADD COLUMN iso_3digit varchar(24);\n");
-print PSQL ("UPDATE global.precipitation SET iso_3digit = geo_worldeez.iso_3digit FROM geo_worldeez WHERE ST_Intersects(precipitation.the_point,geo_worldeez.the_geom_4326);\n");
-##
+print PSQL ("ALTER TABLE global.precipitation  ADD COLUMN country varchar(24);\n");
+print PSQL ("UPDATE global.precipitation SET country = geo_worldmap.adm0_name FROM geo_worldmap 
+WHERE ST_Intersects(geo_worldmap.the_geom_4326,precipitation.the_point) AND precipitation.year = 1948 AND geo_worldmap.adm0_name = 'Solomon Islands';\n");
+
+print PSQL ("ALTER TABLE global.precipitation_tropics  ADD COLUMN country varchar(24);\n");
+print PSQL ("UPDATE global.precipitation_tropics SET country = geo_worldmap.adm0_name FROM geo_worldmap 
+WHERE ST_Intersects(geo_worldmap.the_geom_4326,precipitation_tropics.the_point) AND precipitation_tropics.year = 1948;\n");
+
+
+
+#ALTER TABLE precipitation_tropics ADD COLUMN GID SERIAL;
+
+
 
 ##
 ##
