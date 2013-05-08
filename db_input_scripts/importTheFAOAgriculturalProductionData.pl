@@ -792,12 +792,6 @@ print PSQL ("COMMENT ON COLUMN agri_emissions_manure_management.unit IS 'Unit qu
 print PSQL ("\\COPY agri_emissions_manure_management FROM '/srv/public/input_data_files/FAOSTAT/tmp/emissions_agriculture_manure_management7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
 
-
-
-
-
-
-
 ## Total emissions due to cultivated organic soils
 
 print PSQL ("DROP TABLE agri_emissions_organic_cult; \n");
@@ -914,6 +908,31 @@ print PSQL ("CREATE TABLE agri_emissions_cropland (
 print PSQL ("COMMENT ON TABLE agri_emissions_cropland IS 'These are FAOSTAT GHG emissions from croplands in agriculture Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
 print PSQL ("COMMENT ON COLUMN agri_emissions_cropland.unit IS 'Unit quantity is measured in';\n");
 print PSQL ("\\COPY agri_emissions_cropland FROM '/srv/public/input_data_files/FAOSTAT/tmp/emissions_land_use_cropland7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+
+
+# Total emissions due to forests
+
+print PSQL ("DROP TABLE agri_emissions_forest; \n");
+
+print PSQL ("CREATE TABLE agri_emissions_forest (
+    country_code        integer,
+    country       varchar(72),
+    item_code     integer,
+    item         varchar(72),
+    element_group integer,
+    element_code   integer,
+    element        varchar(144),
+    year         integer,
+    unit         varchar(36),
+    quantity     float,
+    flag     varchar(2));
+
+ \n");
+
+print PSQL ("COMMENT ON TABLE agri_emissions_forest IS 'These are FAOSTAT GHG emissions from forests Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_emissions_forest.unit IS 'Unit quantity is measured in';\n");
+print PSQL ("\\COPY agri_emissions_forest FROM '/srv/public/input_data_files/FAOSTAT/tmp/emissions_land_use_cropland7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+
 
 
 
