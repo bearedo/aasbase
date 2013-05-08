@@ -267,25 +267,27 @@ print PSQL ("\\COPY agri_trade_liveanimals FROM '/srv/public/input_data_files/FA
 
 #############Trade index ###############
 
-print PSQL ("DROP TABLE tradestat.trade_index; \n");
+print PSQL ("DROP TABLE agri_trade_index; \n");
 
-print PSQL ("CREATE TABLE tradestat.trade_index (
+print PSQL ("CREATE TABLE agri_trade_index (
     country_code        integer,
     country       varchar(72),
     item_code     varchar(12),
     item         varchar(72),
+    element_group integer,
     element_code   integer,
     element        varchar(72),
-    unit         varchar(12),
-    source_file  varchar(48),
-    year         integer,
-    quantity     float); \n");
+    year          integer,
+     unit         varchar(12),
+    quantity     float,
+    flag         varchar(12))   ; \n");
 
-print PSQL ("COMMENT ON TABLE tradestat.trade_index IS 'These are FAOSTAT value of trade index numbers data Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
-print PSQL ("COMMENT ON COLUMN tradestat.trade_index.unit IS 'Unit quantity is measured in';\n");
-print PSQL ("COMMENT ON COLUMN tradestat.trade_index.source_file  IS 'Name of the bulk download file';\n");
 
-print PSQL ("\\COPY tradestat.trade_index FROM 'c:/bearedo/DataBase/FAOSTAT/output/Trade Index Numbers1.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("COMMENT ON TABLE agri_trade_index IS 'These are FAOSTAT value of trade index numbers data Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_trade_index.unit IS 'Unit quantity is measured in';\n");
+
+
+print PSQL ("\\COPY agri_trade_index FROM '/srv/public/input_data_files/FAOSTAT/tmp/tradeindexnumbers6.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
 
 ###########################################################################################################
@@ -293,282 +295,554 @@ print PSQL ("\\COPY tradestat.trade_index FROM 'c:/bearedo/DataBase/FAOSTAT/outp
 ###########################################################################################################
 
 
-print PSQL ("SET SEARCH_PATH TO foodsupply;\n");
+print PSQL ("SET SEARCH_PATH TO global;\n");
 
-print PSQL ("DROP TABLE foodsupply.crops_primary_equivalents; \n");
+print PSQL ("DROP TABLE agri_foodsupply_crops_primary_equivalents; \n");
 
-print PSQL ("CREATE TABLE foodsupply.crops_primary_equivalents (
+print PSQL ("CREATE TABLE agri_foodsupply_crops_primary_equivalents (
     country_code        integer,
     country       varchar(72),
     item_code     varchar(12),
     item         varchar(72),
+    element_group integer,
     element_code   integer,
     element        varchar(72),
-    unit         varchar(12),
-    source_file  varchar(48),
-    year         integer,
-    quantity     float); \n");
+    unit         varchar(24),
+    year          integer,
+    quantity     float) ;
+     \n");
 
-print PSQL ("COMMENT ON TABLE foodsupply.crops_primary_equivalents IS 'These are FAOSTAT crop food supply statistics data Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
-print PSQL ("COMMENT ON COLUMN foodsupply.crops_primary_equivalents.unit IS 'Unit crop quantity is measured in';\n");
-print PSQL ("COMMENT ON COLUMN foodsupply.crops_primary_equivalents.source_file  IS 'Name of the bulk download file';\n");
-print PSQL ("\\COPY foodsupply.crops_primary_equivalents FROM 'c:/bearedo/DataBase/FAOSTAT/output/FoodSupply-CropsPrimaryEquivalent1.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
-print PSQL ("\\COPY foodsupply.crops_primary_equivalents FROM 'c:/bearedo/DataBase/FAOSTAT/output/FoodSupply-CropsPrimaryEquivalent2.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+
+
+print PSQL ("COMMENT ON TABLE agri_foodsupply_crops_primary_equivalents IS 'These are FAOSTAT crop food supply statistics data Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_foodsupply_crops_primary_equivalents.unit IS 'Unit crop quantity is measured in';\n");
+e bulk download file';\n");
+print PSQL ("\\COPY agri_foodsupply_crops_primary_equivalents FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_foodsupply-cropsprimaryequivalent1.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_foodsupply_crops_primary_equivalents FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_foodsupply-cropsprimaryequivalent2.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_foodsupply_crops_primary_equivalents FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_foodsupply-cropsprimaryequivalent3.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_foodsupply_crops_primary_equivalents FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_foodsupply-cropsprimaryequivalent4.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_foodsupply_crops_primary_equivalents FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_foodsupply-cropsprimaryequivalent5.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_foodsupply_crops_primary_equivalents FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_foodsupply-cropsprimaryequivalent16csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
 
 # Add on UN georegions and economic groupings
 
-print PSQL ("ALTER TABLE foodsupply.crops_primary_equivalents ADD COLUMN region varchar(36);\n");
-print PSQL ("UPDATE foodsupply.crops_primary_equivalents 
-SET region = public.georegions.region
-FROM public.georegions
-WHERE foodsupply.crops_primary_equivalents.country = public.georegions.country;  \n");
+print PSQL ("ALTER TABLE agri_foodsupply_crops_primary_equivalents ADD COLUMN region varchar(36);\n");
+print PSQL ("UPDATE agri_foodsupply_crops_primary_equivalents 
+SET region = global.geo_regions.region
+FROM global.geo_regions
+WHERE agri_foodsupply_crops_primary_equivalents.country = global.geo_regions.country;  \n");
 
 
-print PSQL ("ALTER TABLE foodsupply.crops_primary_equivalents ADD COLUMN continent varchar(36);\n");
-print PSQL ("UPDATE foodsupply.crops_primary_equivalents 
-SET continent = public.georegions.continent
-FROM public.georegions
-WHERE foodsupply.crops_primary_equivalents.country = public.georegions.country;  \n");
+print PSQL ("ALTER TABLE agri_foodsupply_crops_primary_equivalents ADD COLUMN continent varchar(36);\n");
+print PSQL ("UPDATE agri_foodsupply_crops_primary_equivalents 
+SET continent = global.geo_regions.continent
+FROM global.geo_regions
+WHERE agri_foodsupply_crops_primary_equivalents.country = global.geo_regions.country;  \n");
 
 
-print PSQL ("ALTER TABLE foodsupply.crops_primary_equivalents ADD COLUMN economic_status varchar(36);\n");
-print PSQL ("UPDATE foodsupply.crops_primary_equivalents 
-SET economic_status = public.econgroupings.economic_status
-FROM public.econgroupings
-WHERE foodsupply.crops_primary_equivalents.country = public.econgroupings.country;  \n");
+print PSQL ("ALTER TABLE agri_foodsupply_crops_primary_equivalents ADD COLUMN economic_status varchar(36);\n");
+print PSQL ("UPDATE agri_foodsupply_crops_primary_equivalents 
+SET economic_status = global.socioecon_groupings.economic_status
+FROM global.socioecon_groupings
+WHERE agri_foodsupply_crops_primary_equivalents.country = socioecon_groupings.country;  \n");
 
+### LiveStock and Fish Primary Equivalents
 
-
-print PSQL ("DROP TABLE foodsupply.livestock_fish_equivalents; \n");
-print PSQL ("CREATE TABLE foodsupply.livestock_fish_equivalents (
+print PSQL ("DROP TABLE agri_foodsupply_livestock_fish_equivalents; \n");
+print PSQL ("CREATE TABLE agri_foodsupply_livestock_fish_equivalents (
     country_code        integer,
     country       varchar(72),
-    item_code     varchar(12),
+    item_code     integer,
     item         varchar(72),
+    element_group integer,
     element_code   integer,
-    element        varchar(72),
-    unit         varchar(12),
-    source_file  varchar(48),
+    element        varchar(144),
     year         integer,
-    quantity     float); \n");
+    unit         varchar(36),
+    quantity     float,
+    flag     varchar(2));\n");
 
-print PSQL ("COMMENT ON TABLE foodsupply.livestock_fish_equivalents IS 'These are FAOSTAT livestock and fish food supply statistics data Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
-print PSQL ("COMMENT ON COLUMN foodsupply.livestock_fish_equivalents.unit IS 'Unit quantity is measured in';\n");
-print PSQL ("COMMENT ON COLUMN foodsupply.livestock_fish_equivalents.source_file  IS 'Name of the bulk download file';\n");
-print PSQL ("\\COPY foodsupply.livestock_fish_equivalents FROM 'c:/bearedo/DataBase/FAOSTAT/output/FoodSupply-LiveStock&FishPrimaryEquivalent1.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+#CountryCode|Country|ItemCode|Item|ElementGroup|ElementCode|Element|Year|Unit|Value|Flag
 
-print PSQL ("ALTER TABLE foodsupply.crops_primary_equivalents ADD COLUMN region varchar(36);\n");
-print PSQL ("UPDATE foodsupply.crops_primary_equivalents 
-SET region = public.georegions.region
-FROM public.georegions
-WHERE foodsupply.crops_primary_equivalents.country = public.georegions.country;  \n");
+print PSQL ("COMMENT ON TABLE agri_foodsupply_livestock_fish_equivalents IS 'These are FAOSTAT livestock and fish food supply statistics data Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_foodsupply_livestock_fish_equivalents.unit IS 'Unit quantity is measured in';\n");
 
-print PSQL ("ALTER TABLE foodsupply.crops_primary_equivalents ADD COLUMN continent varchar(36);\n");
-print PSQL ("UPDATE foodsupply.crops_primary_equivalents 
-SET continent = public.georegions.continent
-FROM public.georegions
-WHERE foodsupply.crops_primary_equivalents.country = public.georegions.country;  \n");
 
-print PSQL ("ALTER TABLE foodsupply.crops_primary_equivalents ADD COLUMN economic_status varchar(36);\n");
-print PSQL ("UPDATE foodsupply.crops_primary_equivalents 
-SET economic_status = public.econgroupings.economic_status
-FROM public.econgroupings
-WHERE foodsupply.crops_primary_equivalents.country = public.econgroupings.country;  \n");
+print PSQL ("\\COPY agri_foodsupply_livestock_fish_equivalents FROM '/srv/public/input_data_files/FAOSTAT/tmp/foodsupply-livestockfishprimaryequivalent7.csv.txt' WITH DELIMITER '|' null as '' CSV header \n"); 
+
+
+print PSQL ("ALTER TABLE agri_foodsupply_livestock_fish_equivalents ADD COLUMN region varchar(36);\n");
+print PSQL ("UPDATE agri_foodsupply_livestock_fish_equivalents 
+SET region = global.geo_regions.region
+FROM global.geo_regions
+WHERE agri_foodsupply_livestock_fish_equivalents.country = global.geo_regions.country;  \n");
+
+print PSQL ("ALTER TABLE agri_foodsupply_livestock_fish_equivalents ADD COLUMN continent varchar(36);\n");
+print PSQL ("UPDATE agri_foodsupply_livestock_fish_equivalents 
+SET continent = global.geo_regions.continent
+FROM global.geo_regions
+WHERE agri_foodsupply_livestock_fish_equivalents.country = global.geo_regions.country;  \n");
+
+print PSQL ("ALTER TABLE agri_foodsupply_livestock_fish_equivalents ADD COLUMN economic_status varchar(36);\n");
+print PSQL ("UPDATE agri_foodsupply_livestock_fish_equivalents 
+SET economic_status = global.socioecon_groupings.economic_status
+FROM global.socioecon_groupings
+WHERE agri_foodsupply_livestock_fish_equivalents.country = global.socioecon_groupings.country;  \n");
 
 ###########################################################################################################
 ######FILL Food balance SCHEMA #############################
 ###########################################################################################################
 
 
-print PSQL ("SET SEARCH_PATH TO foodbalance;\n");
+print PSQL ("SET SEARCH_PATH TO global;\n");
 
-print PSQL ("DROP TABLE foodbalance.sheets; \n");
+print PSQL ("DROP TABLE agri_foodbalance__sheets; \n");
 
-print PSQL ("CREATE TABLE foodbalance.sheets (
-    country_code        integer,
+print PSQL ("CREATE TABLE agri_foodbalance_sheets (
+   country_code        integer,
     country       varchar(72),
     item_code     varchar(12),
     item         varchar(72),
+    element_group integer,
     element_code   integer,
     element        varchar(72),
-    unit         varchar(12),
-    source_file  varchar(48),
-    year         integer,
-    quantity     float); \n");
+    unit         varchar(24),
+    year          integer,
+    quantity     float) ;
+ \n");
 
-print PSQL ("COMMENT ON TABLE foodbalance.sheets IS 'These are FAOSTAT value of food balance statistics data Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+#CountryCode"|"Country"|"ItemCode"|"Item"|"ElementGroup"|"ElementCode"|"Element"|"Unit"|"Year"|"Quantity"
+
+
+print PSQL ("COMMENT ON TABLE agri_foodbalance_sheets IS 'These are FAOSTAT value of food balance statistics data Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
 print PSQL ("COMMENT ON COLUMN foodbalance.sheets.unit IS 'Unit quantity is measured in';\n");
-print PSQL ("COMMENT ON COLUMN foodbalance.sheets.source_file  IS 'Name of the bulk download file';\n");
-print PSQL ("\\COPY foodbalance.sheets FROM 'c:/bearedo/DataBase/FAOSTAT/output/FoodBalanceSheets1.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
-print PSQL ("\\COPY foodbalance.sheets FROM 'c:/bearedo/DataBase/FAOSTAT/output/FoodBalanceSheets2.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
-print PSQL ("\\COPY foodbalance.sheets FROM 'c:/bearedo/DataBase/FAOSTAT/output/FoodBalanceSheets3.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
-print PSQL ("\\COPY foodbalance.sheets FROM 'c:/bearedo/DataBase/FAOSTAT/output/FoodBalanceSheets4.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
-print PSQL ("\\COPY foodbalance.sheets FROM 'c:/bearedo/DataBase/FAOSTAT/output/FoodBalanceSheets5.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+
+print PSQL ("\\COPY agri_foodbalance_sheets FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_foodbalancesheets1.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_foodbalance_sheets FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_foodbalancesheets2.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_foodbalance_sheets FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_foodbalancesheets3.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_foodbalance_sheets FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_foodbalancesheets4.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_foodbalance_sheets FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_foodbalancesheets5.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_foodbalance_sheets FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_foodbalancesheets6csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_foodbalance_sheets FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_foodbalancesheets7csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_foodbalance_sheets FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_foodbalancesheets8csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
 
-print PSQL ("DROP TABLE foodbalance.commodity_crops; \n");
 
-print PSQL ("CREATE TABLE foodbalance.commodity_crops (
+
+print PSQL ("DROP TABLE agri_foodbalance_commodity_crops; \n");
+
+print PSQL ("CREATE TABLE agri_foodbalance_commodity_crops (
     country_code        integer,
     country       varchar(72),
     item_code     varchar(12),
     item         varchar(72),
+    element_group integer,
     element_code   integer,
     element        varchar(72),
-    unit         varchar(12),
-    source_file  varchar(48),
-    year         integer,
-    quantity     float); \n");
-
-print PSQL ("COMMENT ON TABLE foodbalance.commodity_crops IS 'These are FAOSTAT value of food balance statistics data Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
-print PSQL ("COMMENT ON COLUMN foodbalance.commodity_crops.unit IS 'Unit quantity is measured in';\n");
-print PSQL ("COMMENT ON COLUMN foodbalance.commodity_crops.source_file  IS 'Name of the bulk download file';\n");
-print PSQL ("\\COPY foodbalance.commodity_crops FROM 'c:/bearedo/DataBase/FAOSTAT/output/Commodity Balances-Crops1.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
-print PSQL ("\\COPY foodbalance.commodity_crops FROM 'c:/bearedo/DataBase/FAOSTAT/output/Commodity Balances-Crops2.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
-print PSQL ("\\COPY foodbalance.commodity_crops FROM 'c:/bearedo/DataBase/FAOSTAT/output/Commodity Balances-Crops3.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+    unit         varchar(24),
+    year          integer,
+    quantity     float) ;
 
 
-print PSQL ("DROP TABLE foodbalance.commodity_livestock; \n");
+
+\n");
+
+print PSQL ("COMMENT ON TABLE agri_foodbalance_commodity_crops IS 'These are FAOSTAT value of food balance statistics data Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_foodbalance_commodity_crops.unit IS 'Unit quantity is measured in';\n");
+print PSQL ("\\COPY agri_foodbalance_commodity_crops FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_commoditybalances-crops1.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_foodbalance_commodity_crops FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_commoditybalances-crops2.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_foodbalance_commodity_crops FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_commoditybalances-crops3.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_foodbalance_commodity_crops FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_commoditybalances-crops4.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_foodbalance_commodity_crops FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_commoditybalances-crops5.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_foodbalance_commodity_crops FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_commoditybalances-crops6.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
 
-print PSQL ("CREATE TABLE foodbalance.commodity_livestock (
+
+
+print PSQL ("DROP TABLE agri_foodbalance_commodity_livestock; \n");
+
+
+print PSQL ("CREATE TABLE agri_foodbalance_commodity_livestock (
     country_code        integer,
     country       varchar(72),
-    item_code     varchar(12),
+    item_code     integer,
     item         varchar(72),
+    element_group integer,
     element_code   integer,
-    element        varchar(72),
-    unit         varchar(12),
-    source_file  varchar(48),
+    element        varchar(144),
     year         integer,
-    quantity     float); \n");
+    unit         varchar(36),
+    quantity     float,
+    flag     varchar(2));
 
-print PSQL ("COMMENT ON TABLE foodbalance.commodity_livestock IS 'These are FAOSTAT value of food balance statistics data Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
-print PSQL ("COMMENT ON COLUMN foodbalance.commodity_livestock.unit IS 'Unit quantity is measured in';\n");
-print PSQL ("COMMENT ON COLUMN foodbalance.commodity_livestock.source_file  IS 'Name of the bulk download file';\n");
-print PSQL ("\\COPY foodbalance.commodity_livestock FROM 'c:/bearedo/DataBase/FAOSTAT/output/Commodity Balances-Livestock1.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+\n");
+
+
+
+print PSQL ("COMMENT ON TABLE agri_foodbalance_commodity_livestock IS 'These are FAOSTAT value of food balance statistics data Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_foodbalance_commodity_livestock.unit IS 'Unit quantity is measured in';\n");
+
+print PSQL ("\\COPY agri_foodbalance_commodity_livestock FROM 'c:/bearedo/DataBase/FAOSTAT/output/Commodity Balances-Livestock1.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
 
 ###########################################################################################################
-######FILL PRICES SCHEMA #############################
+###### FILL PRICES DATA #############################
 ###########################################################################################################
 
 
-print PSQL ("SET SEARCH_PATH TO prices;\n");
+print PSQL ("SET SEARCH_PATH TO global;\n");
 
-print PSQL ("DROP TABLE prices.price_index_agric; \n");
+print PSQL ("DROP TABLE agri_price_index_consumer; \n");
 
-print PSQL ("CREATE TABLE prices.price_index_agric (
+print PSQL ("CREATE TABLE agri_price_index_consumer (
     country_code        integer,
     country       varchar(72),
     item_code     varchar(12),
     item         varchar(72),
+    element_group integer,
     element_code   integer,
     element        varchar(72),
-    unit         varchar(12),
-    source_file  varchar(48),
-    year         integer,
-    quantity     float); \n");
+    unit         varchar(24),
+    year          integer,
+    quantity     float) ;
 
-print PSQL ("COMMENT ON TABLE prices.price_index_agric IS 'These are FAOSTAT Agricultural producer prices indices Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+
+; \n");
+
+#CountryCode|Country|ItemCode|Item|ElementGroup|ElementCode|Element|Year|Unit|Value|Flag
+
+print PSQL ("COMMENT ON TABLE agri_price_index_consumer IS 'These are FAOSTAT Agricultural producer prices indices Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
 print PSQL ("COMMENT ON COLUMN prices.price_index_agric.unit IS 'Unit quantity is measured in';\n");
-print PSQL ("COMMENT ON COLUMN prices.price_index_agric.source_file  IS 'Name of the bulk download file';\n");
-print PSQL ("\\COPY prices.price_index_agric FROM 'c:/bearedo/DataBase/FAOSTAT/output/Agricultural_Producer_Price_Indices1.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
+print PSQL ("\\COPY agri_price_index_consumer FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_consumer_price_indices1.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
+#### Agricultural producer price indices ###
 
-print PSQL ("DROP TABLE prices.price_index_consumer; \n");
+print PSQL ("DROP TABLE agri_price_index_producer; \n");
+print PSQL ("CREATE TABLE agri_price_index_producer (
+   country_code        integer,
+    country       varchar(72),
+    item_code     integer,
+    item         varchar(72),
+    element_group integer,
+    element_code   integer,
+    element        varchar(144),
+    year         integer,
+    unit         varchar(36),
+    quantity     float,
+    flag     varchar(2));
 
-print PSQL ("CREATE TABLE prices.price_index_consumer (
+ \n");
+print PSQL ("COMMENT ON TABLE agri_price_index_producer IS 'These are FAOSTAT agricultural producer prices indices Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_price_price_index_consumer.unit IS 'Unit quantity is measured in';\n");
+
+print PSQL ("\\COPY agri_price_index_producer FROM '/srv/public/input_data_files/FAOSTAT/tmp/agricultural_producer_price_indices6.csv.txt' WITH DELIMITER '|' null as '' CSV header \n"); 
+
+####
+
+print PSQL ("DROP TABLE agri_price_stats; \n");
+
+print PSQL ("CREATE TABLE agri_price_stats (
     country_code        integer,
     country       varchar(72),
-    item_code     varchar(12),
+    item_code     integer,
     item         varchar(72),
+    element_group integer,
     element_code   integer,
-    element        varchar(72),
-    unit         varchar(12),
-    source_file  varchar(48),
+    element        varchar(144),
     year         integer,
-    quantity     float); \n");
-
-print PSQL ("COMMENT ON TABLE prices.price_index_consumer IS 'These are FAOSTAT consumer prices indices Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
-print PSQL ("COMMENT ON COLUMN prices.price_index_consumer.unit IS 'Unit quantity is measured in';\n");
-print PSQL ("COMMENT ON COLUMN prices.price_index_consumer.source_file  IS 'Name of the bulk download file';\n");
-print PSQL ("\\COPY prices.price_index_consumer FROM 'c:/bearedo/DataBase/FAOSTAT/output/Consumer_Price_Indices1.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+    unit         varchar(36),
+    quantity     float,
+    flag     varchar(2));
 
 
-print PSQL ("DROP TABLE prices.price_stats; \n");
+ \n");
 
-print PSQL ("CREATE TABLE prices.price_stats (
-    country_code        integer,
-    country       varchar(72),
-    item_code     varchar(12),
-    item         varchar(72),
-    element_code   integer,
-    element        varchar(72),
-    unit         varchar(12),
-    source_file  varchar(48),
-    year         integer,
-    quantity     float); \n");
+print PSQL ("COMMENT ON TABLE agri_price_stats IS 'These are FAOSTAT price statistics Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_price_stats.unit IS 'Unit quantity is measured in';\n");
 
-print PSQL ("COMMENT ON TABLE prices.price_stats IS 'These are FAOSTAT price statistics Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
-print PSQL ("COMMENT ON COLUMN prices.price_stats.unit IS 'Unit quantity is measured in';\n");
-print PSQL ("COMMENT ON COLUMN prices.price_stats.source_file  IS 'Name of the bulk download file';\n");
-print PSQL ("\\COPY prices.price_stats FROM 'c:/bearedo/DataBase/FAOSTAT/output/PriceSTAT1.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_price_stats FROM '/srv/public/input_data_files/FAOSTAT/tmp/prices6.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_price_stats FROM '/srv/public/input_data_files/FAOSTAT/tmp/pricearchive6.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
 
 
 
 ############################################################################################################
-#######FILL RESOURCES SCHEMA #############################
+#######FILL SOCIO-ECONOMIC SCHEMAs #############################
 ############################################################################################################
 
 
-print PSQL ("SET SEARCH_PATH TO resources;\n");
+print PSQL ("SET SEARCH_PATH TO global;\n");
 
-print PSQL ("DROP TABLE resources.population; \n");
+print PSQL ("DROP TABLE socioecon_population; \n");
 
-print PSQL ("CREATE TABLE resources.population (
+print PSQL ("CREATE TABLE socioecon_population (
     country_code        integer,
     country       varchar(72),
-    item_code     varchar(12),
+    item_code     integer,
     item         varchar(72),
+    element_group integer,
     element_code   integer,
-    element        varchar(72),
-    unit         varchar(12),
-    source_file  varchar(48),
+    element        varchar(144),
     year         integer,
-    quantity     float); \n");
+    unit         varchar(36),
+    quantity     float,
+    flag     varchar(2));
 
-print PSQL ("COMMENT ON TABLE resources.population IS 'These are FAOSTAT population statistics Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+ \n");
+
+print PSQL ("COMMENT ON TABLE socioecon_population IS 'These are FAOSTAT global human population statistics Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
 print PSQL ("COMMENT ON COLUMN resources.population.unit IS 'Unit quantity is measured in';\n");
 print PSQL ("COMMENT ON COLUMN resources.population.source_file  IS 'Name of the bulk download file';\n");
-print PSQL ("\\COPY resources.population FROM 'c:/bearedo/DataBase/FAOSTAT/output/PopSTAT-Annual-Time-Series1.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY socioecon_population FROM '/srv/public/input_data_files/FAOSTAT/tmp/population-annualtimeseries7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
+### Investment capital stock ####
 
+print PSQL ("SET SEARCH_PATH TO global;\n");
 
-print PSQL ("SET SEARCH_PATH TO resources;\n");
+print PSQL ("DROP TABLE socioecon_investment_capital_stock; \n");
 
-print PSQL ("DROP TABLE resources.economics; \n");
-
-print PSQL ("CREATE TABLE resources.economics (
+print PSQL ("CREATE TABLE socioecon_investment_capital_stock (
     country_code        integer,
     country       varchar(72),
-    item_code     varchar(12),
+    item_code     integer,
     item         varchar(72),
+    element_group integer,
     element_code   integer,
-    element        varchar(72),
-    unit         varchar(12),
-    source_file  varchar(48),
+    element        varchar(144),
     year         integer,
-    quantity     float); \n");
+    unit         varchar(36),
+    quantity     float,
+    flag     varchar(2));
 
-print PSQL ("COMMENT ON TABLE resources.economics IS 'These are FAOSTAT economic capital stock statistics Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
-print PSQL ("COMMENT ON COLUMN resources.economics.unit IS 'Unit quantity is measured in';\n");
-print PSQL ("COMMENT ON COLUMN resources.economics.source_file  IS 'Name of the bulk download file';\n");
-print PSQL ("\\COPY resources.economics FROM 'c:/bearedo/DataBase/FAOSTAT/output/EconSTAT - Capital Stock1.csv' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+ \n");
 
+print PSQL ("COMMENT ON TABLE socioecon_investment_capital_stock IS 'These are FAOSTAT economic capital investment stock statistics Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN socioecon_investment_capital_stock.unit IS 'Unit quantity is measured in';\n");
+print PSQL ("\\COPY socioecon_investment_capital_stock FROM '/srv/public/input_data_files/FAOSTAT/tmp/investment-capitalstock7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+
+###################### Investment in machinery ############################
+
+print PSQL ("DROP TABLE socioecon_investment_machinery; \n");
+
+print PSQL ("CREATE TABLE socioecon_investment_machinery (
+    country_code        integer,
+    country       varchar(72),
+    item_code     integer,
+    item         varchar(72),
+    element_group integer,
+    element_code   integer,
+    element        varchar(144),
+    year         integer,
+    unit         varchar(36),
+    quantity     float,
+    flag     varchar(2));
+
+ \n");
+
+print PSQL ("COMMENT ON TABLE socioecon_investment_machinery IS 'These are FAOSTAT economic investment in machinery Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN socioecon_investment_machinery.unit IS 'Unit quantity is measured in';\n");
+print PSQL ("\\COPY socioecon_investment_machinery FROM '/srv/public/input_data_files/FAOSTAT/tmp/investment-machineryarchive7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+
+
+########################Emissions data ####################################################
+
+## Total emissions 
+
+print PSQL ("DROP TABLE agri_emissions_total; \n");
+
+print PSQL ("CREATE TABLE agri_emissions_total (
+    country_code        integer,
+    country       varchar(72),
+    item_code     integer,
+    item         varchar(72),
+    element_group integer,
+    element_code   integer,
+    element        varchar(144),
+    year         integer,
+    unit         varchar(36),
+    quantity     float,
+    flag     varchar(2));
+
+ \n");
+
+print PSQL ("COMMENT ON TABLE agri_emissions_total IS 'These are FAOSTAT total GHG emissions from agriculture Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_emissions_total.unit IS 'Unit quantity is measured in';\n");
+print PSQL ("\\COPY agri_emissions_total FROM '/srv/public/input_data_files/FAOSTAT/tmp/emissions_agriculture_agriculture_total7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+
+
+## Total emissions due to burning crop residues
+
+print PSQL ("DROP TABLE agri_emissions_burning_crop_residues; \n");
+
+print PSQL ("CREATE TABLE agri_emissions_burning_crop_residues (
+    country_code        integer,
+    country       varchar(72),
+    item_code     integer,
+    item         varchar(72),
+    element_group integer,
+    element_code   integer,
+    element        varchar(144),
+    year         integer,
+    unit         varchar(36),
+    quantity     float,
+    flag     varchar(2));
+
+ \n");
+
+print PSQL ("COMMENT ON TABLE agri_emissions_burning_crop_residues IS 'These are FAOSTAT GHG emissions from burning crop residues in agriculture Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_emissions_total.unit IS 'Unit quantity is measured in';\n");
+print PSQL ("\\COPY agri_emissions_burning_crop_residues FROM '/srv/public/input_data_files/FAOSTAT/tmp/emissions_agriculture_burning_crop_residues7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+
+
+## Total emissions due to crop residues
+
+print PSQL ("DROP TABLE agri_emissions_crop_residues; \n");
+
+print PSQL ("CREATE TABLE agri_emissions_crop_residues (
+    country_code        integer,
+    country       varchar(72),
+    item_code     integer,
+    item         varchar(72),
+    element_group integer,
+    element_code   integer,
+    element        varchar(144),
+    year         integer,
+    unit         varchar(36),
+    quantity     float,
+    flag     varchar(2));
+
+ \n");
+
+print PSQL ("COMMENT ON TABLE agri_emissions_crop_residues IS 'These are FAOSTAT GHG emissions from crop residues in agriculture Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_emissions_crop_residues.unit IS 'Unit quantity is measured in';\n");
+print PSQL ("\\COPY agri_emissions_crop_residues FROM '/srv/public/input_data_files/FAOSTAT/tmp/emissions_agriculture_crop_residues7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+
+
+## Total emissions due to manure applied to soils
+
+print PSQL ("DROP TABLE agri_emissions_manure_soils; \n");
+
+print PSQL ("CREATE TABLE agri_emissions_manure_soils (
+    country_code        integer,
+    country       varchar(72),
+    item_code     integer,
+    item         varchar(72),
+    element_group integer,
+    element_code   integer,
+    element        varchar(144),
+    year         integer,
+    unit         varchar(36),
+    quantity     float,
+    flag     varchar(2));
+
+ \n");
+
+print PSQL ("COMMENT ON TABLE agri_emissions_manure_soils IS 'These are FAOSTAT GHG emissions from manure applied to soils in agriculture Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_emissions_manure_soils.unit IS 'Unit quantity is measured in';\n");
+print PSQL ("\\COPY agri_emissions_manure_soils FROM '/srv/public/input_data_files/FAOSTAT/tmp/emissions_agriculture_manure_applied_to_soils7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+
+
+## Total emissions due to manure left on pasture
+
+print PSQL ("DROP TABLE agri_emissions_manure_pasture; \n");
+
+print PSQL ("CREATE TABLE agri_emissions_manure_pasture (
+    country_code        integer,
+    country       varchar(72),
+    item_code     integer,
+    item         varchar(72),
+    element_group integer,
+    element_code   integer,
+    element        varchar(144),
+    year         integer,
+    unit         varchar(36),
+    quantity     float,
+    flag     varchar(2));
+
+ \n");
+
+print PSQL ("COMMENT ON TABLE agri_emissions_manure_pasture IS 'These are FAOSTAT GHG emissions from manure left on pasture in agriculture Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_emissions_manure_pasture.unit IS 'Unit quantity is measured in';\n");
+print PSQL ("\\COPY agri_emissions_manure_pasture FROM '/srv/public/input_data_files/FAOSTAT/tmp/emissions_agriculture_manure_left_on_pasture7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+
+
+## Total emissions due to manure management
+
+print PSQL ("DROP TABLE agri_emissions_manure_management; \n");
+
+print PSQL ("CREATE TABLE agri_emissions_manure_management (
+    country_code        integer,
+    country       varchar(72),
+    item_code     integer,
+    item         varchar(72),
+    element_group integer,
+    element_code   integer,
+    element        varchar(144),
+    year         integer,
+    unit         varchar(36),
+    quantity     float,
+    flag     varchar(2));
+
+ \n");
+
+print PSQL ("COMMENT ON TABLE agri_emissions_manure_management IS 'These are FAOSTAT GHG emissions from manure management in agriculture Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_emissions_manure_management.unit IS 'Unit quantity is measured in';\n");
+print PSQL ("\\COPY agri_emissions_manure_management FROM '/srv/public/input_data_files/FAOSTAT/tmp/emissions_agriculture_manure_management7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+
+
+
+
+
+
+
+
+## Total emissions due to cultivated organic soils
+
+print PSQL ("DROP TABLE agri_emissions_organic_cult; \n");
+
+print PSQL ("CREATE TABLE agri_emissions_organic_cult (
+    country_code        integer,
+    country       varchar(72),
+    item_code     integer,
+    item         varchar(72),
+    element_group integer,
+    element_code   integer,
+    element        varchar(144),
+    year         integer,
+    unit         varchar(36),
+    quantity     float,
+    flag     varchar(2));
+
+ \n");
+
+print PSQL ("COMMENT ON TABLE agri_emissions_organic_cult IS 'These are FAOSTAT GHG emissions from cultivated organic soils agriculture Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_emissions_manure_pasture.unit IS 'Unit quantity is measured in';\n");
+print PSQL ("\\COPY agri_emissions_organic_cult FROM '/srv/public/input_data_files/FAOSTAT/tmp/emissions_agriculture_cultivated_organic_soils7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+
+## Total emissions due to enteric fermentation
+
+print PSQL ("DROP TABLE agri_emissions_enteric_ferment; \n");
+
+print PSQL ("CREATE TABLE agri_emissions_enteric_ferment (
+    country_code        integer,
+    country       varchar(72),
+    item_code     integer,
+    item         varchar(72),
+    element_group integer,
+    element_code   integer,
+    element        varchar(144),
+    year         integer,
+    unit         varchar(36),
+    quantity     float,
+    flag     varchar(2));
+
+ \n");
+
+print PSQL ("COMMENT ON TABLE agri_emissions_enteric_ferment IS 'These are FAOSTAT GHG emissions from cultivated organic soils agriculture Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_emissions_enteric_ferment.unit IS 'Unit quantity is measured in';\n");
+print PSQL ("\\COPY agri_emissions_enteric_ferment FROM '/srv/public/input_data_files/FAOSTAT/tmp/emissions_agriculture_enteric_fermentation7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
 
 
