@@ -845,6 +845,84 @@ print PSQL ("COMMENT ON COLUMN agri_emissions_enteric_ferment.unit IS 'Unit quan
 print PSQL ("\\COPY agri_emissions_enteric_ferment FROM '/srv/public/input_data_files/FAOSTAT/tmp/emissions_agriculture_enteric_fermentation7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
 
+## Total emissions due to rice cultivation
+
+print PSQL ("DROP TABLE agri_emissions_rice; \n");
+
+print PSQL ("CREATE TABLE agri_emissions_rice (
+    country_code        integer,
+    country       varchar(72),
+    item_code     integer,
+    item         varchar(72),
+    element_group integer,
+    element_code   integer,
+    element        varchar(144),
+    year         integer,
+    unit         varchar(36),
+    quantity     float,
+    flag     varchar(2));
+
+ \n");
+
+print PSQL ("COMMENT ON TABLE agri_emissions_rice IS 'These are FAOSTAT GHG emissions due to rice cultivation in agriculture Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_emissions_rice.unit IS 'Unit quantity is measured in';\n");
+print PSQL ("\\COPY agri_emissions_rice FROM '/srv/public/input_data_files/FAOSTAT/tmp/emissions_agriculture_rice_cultivation7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+
+# Total emissions due to synthetic fertilisers
+
+print PSQL ("DROP TABLE agri_emissions_fertilisers; \n");
+
+print PSQL ("CREATE TABLE agri_emissions_fertilisers (
+    country_code        integer,
+    country       varchar(72),
+    item_code     integer,
+    item         varchar(72),
+    element_group integer,
+    element_code   integer,
+    element        varchar(144),
+    year         integer,
+    unit         varchar(36),
+    quantity     float,
+    flag     varchar(2));
+
+ \n");
+
+print PSQL ("COMMENT ON TABLE agri_emissions_fertilisers IS 'These are FAOSTAT GHG emissions due to synthetic fertilisers in agriculture Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_emissions_fertilisers.unit IS 'Unit quantity is measured in';\n");
+print PSQL ("\\COPY agri_emissions_fertilisers FROM '/srv/public/input_data_files/FAOSTAT/tmp/emissions_agriculture_synthetic_fertilizers7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+
+
+# Total emissions due to cropland
+
+print PSQL ("DROP TABLE agri_emissions_cropland; \n");
+
+print PSQL ("CREATE TABLE agri_emissions_cropland (
+    country_code        integer,
+    country       varchar(72),
+    item_code     integer,
+    item         varchar(72),
+    element_group integer,
+    element_code   integer,
+    element        varchar(144),
+    year         integer,
+    unit         varchar(36),
+    quantity     float,
+    flag     varchar(2));
+
+ \n");
+
+print PSQL ("COMMENT ON TABLE agri_emissions_cropland IS 'These are FAOSTAT GHG emissions from croplands in agriculture Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_emissions_cropland.unit IS 'Unit quantity is measured in';\n");
+print PSQL ("\\COPY agri_emissions_cropland FROM '/srv/public/input_data_files/FAOSTAT/tmp/emissions_land_use_cropland7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+
+
+
+
+
+
+
+
+
 
 
 
