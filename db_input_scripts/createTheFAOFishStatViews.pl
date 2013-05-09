@@ -19,6 +19,7 @@ GROUP BY fish_capture.country, fish_capture.species, fish_capture.prodarea, fish
  
 print PSQL ("COMMENT ON VIEW fish_global_fish_production IS 'Capture and aquaculture production by species, year, country and fishing area for the globe from FAO time-series data';\n");
 
+###### Global capture fish production by economic region #########
 
 print PSQL ("DROP VIEW  fish_global_capture_production_by_economic_region CASCADE;\n");
 
@@ -46,69 +47,71 @@ print PSQL ("COMMENT ON VIEW fish_global_capture_production_by_economic_region I
 
 ###########################################################################################
 
-print PSQL ("DROP VIEW   GlobalAquacultureProductionByEconomicRegion  CASCADE;\n");
+print PSQL ("DROP VIEW   aqua_global_production_with_economic_region  CASCADE;\n");
 
-print PSQL ("CREATE VIEW GlobalAquacultureProductionByEconomicRegion 
+print PSQL ("CREATE VIEW aqua_global_production_with_economic_region
 AS
 
  SELECT  
-  aquaproduction.species, 
-  aquaproduction.fishingarea, 
-  aquaproduction.environment, 
-  aquaproduction.year, 
-  aquaproduction.quantity as weight,
-  aquavalue.quantity      as cash_value, 
-  econgroupings.country, 
-  econgroupings.economic_status
+  aqua_production.species, 
+  aqua_production.environment, 
+  aqua_production.year, 
+  aqua_production.quantity as weight,
+  aqua_value.quantity      as cash_value, 
+  socioecon_groupings.country, 
+  socioecon_groupings.economic_status
 FROM 
-  fisheries.aquaproduction,
-  fisheries.aquavalue, 
-  public.econgroupings
+  aqua_production,
+  aqua_value, 
+  socioecon_groupings
 WHERE 
-  aquaproduction.country = econgroupings.country
+  aqua_production.country = socioecon_groupings.country
 ORDER BY
-  aquaproduction.year ASC, 
-  aquaproduction.country ASC, 
-  aquaproduction.species ASC ;\n");  
+  aqua_production.year ASC, 
+  aqua_production.country ASC, 
+  aqua_production.species ASC ;\n");  
  
  
  
-print PSQL ("COMMENT ON VIEW GlobalAquacultureProductionByEconomicRegion IS 'Aquaculture production (weight and cash) by Economic Region';\n");
-
+print PSQL ("COMMENT ON VIEW aqua_global_production_with_economic_region IS  'Total aquaculture production (weight and cash) with economic region';\n");
 
 ##########################################################################################
 
-print PSQL ("DROP VIEW  GlobalCaptureFishProductionByEconomicRegionWithPopulation CASCADE;\n");
+print PSQL ("DROP VIEW  fish_capture_production_with_economic_region_and_population CASCADE;\n");
 
-print PSQL ("CREATE VIEW GlobalCaptureFishProductionByEconomicRegionWithPopulation 
+print PSQL ("CREATE VIEW fish_capture_production_with_economic_region_and_population
   AS
 
 SELECT 
-  capture.species, 
-  capture.fishingarea, 
-  capture.measure, 
-  capture.quantity as weight, 
-  econgroupings.country, 
-  econgroupings.economic_status, 
-  population.quantity as population, 
-  population.year, 
-  population.unit, 
-  population.element, 
-  population.item
+  fish_capture.species, 
+  fish_capture.prodarea, 
+  fish_capture.measure, 
+  fish_capture.quantity as weight, 
+  socioecon_groupings.country, 
+  socioecon_groupings.economic_status, 
+  socioecon_population.quantity as population, 
+  socioecon_population.year, 
+  socioecon_population.unit, 
+  socioecon_population.element, 
+  socioecon_population.item
 FROM 
-  fisheries.capture, 
-  public.econgroupings, 
-  resources.population
+  fish_capture, 
+  socioecon_groupings, 
+  socioecon_population
 WHERE 
-  capture.measure = 'Quantity (tonnes)' AND 
-  capture.country = econgroupings.country AND
-  capture.country = population.country AND
-  capture.year    = population.year AND
-  population.element = 'Total Population - Both sexes'
+  fish_capture.measure = 'Quantity (tonnes)' AND 
+  fish_capture.country = socioecon_groupings.country AND
+  fish_capture.country = socioecon_population.country AND
+  fish_capture.year    = socioecon_population.year AND
+  socioecon_population.element = 'Total Population - Both sexes'
 ORDER BY
-  capture.year ASC, 
-  capture.country ASC, 
-  capture.species ASC; \n");
+  fish_capture.year ASC, 
+  fish_capture.country ASC, 
+  fish_capture.species ASC; \n");
+
+print PSQL ("COMMENT ON VIEW fish_capture_production_with_economic_region_and_population IS  'Total capture production (tonnes) with economic region and population';\n");
+
+
 
 
 ##########################################################################################
@@ -117,275 +120,403 @@ ORDER BY
 
 ### East Timor 
 
-print PSQL ("DROP VIEW  CaptureFishProductionETimorWithPopulation CASCADE;\n");
+print PSQL ("SET SEARCH_PATH to timorleste;\n");
 
-print PSQL ("CREATE VIEW CaptureFishProductionETimorWithPopulation 
+print PSQL ("DROP VIEW  timorleste.fish_capture_production_with_population CASCADE;\n");
+
+print PSQL ("CREATE VIEW timorleste.fish_capture_production_with_population
   AS
 
 SELECT 
-  capture.species, 
-  capture.fishingarea, 
-  capture.measure, 
-  capture.quantity as weight,
-  capture.country,
-  population.quantity as population, 
-  population.year, 
-  population.unit, 
-  population.element, 
-  population.item
+  fish_capture.species, 
+  fish_capture.prodarea, 
+  fish_capture.measure, 
+  fish_capture.quantity as weight,
+  fish_capture.country,
+  socioecon_population.quantity as population, 
+  socioecon_population.year, 
+  socioecon_population.unit, 
+  socioecon_population.element, 
+  socioecon_population.item
 FROM 
-  fisheries.capture, 
-  resources.population
+  global.fish_capture, 
+  global.socioecon_population
 WHERE 
-  capture.measure = 'Quantity (tonnes)' AND 
-  capture.country = population.country AND
-  capture.country = 'Timor-Leste' AND
-  capture.year    = population.year AND
-  population.element = 'Total Population - Both sexes'
+  fish_capture.measure = 'Quantity (tonnes)' AND 
+  fish_capture.country = socioecon_population.country AND
+  fish_capture.country = 'Timor-Leste' AND
+  fish_capture.year    = socioecon_population.year AND
+  socioecon_population.element = 'Total Population - Both sexes'
 ORDER BY
-  capture.year ASC, 
-  capture.country ASC, 
-  capture.species ASC; \n");
+  fish_capture.year ASC, 
+  fish_capture.country ASC, 
+  fish_capture.species ASC; \n");
 
-print PSQL ("COMMENT ON VIEW CaptureFishProductionETimorWithPopulation  IS 'Capture fish production (weight and cash) in East Timor with human population information';\n");
+print PSQL ("COMMENT ON VIEW timorleste.fish_capture_production_with_population IS 'Capture fish production (weight and cash) in East Timor with human population information'; \n");
 
-### Bangladesh 
+### Bangladesh #########
 
-print PSQL ("DROP VIEW  CaptureFishProductionBanglaWithPopulation CASCADE;\n");
 
-print PSQL ("CREATE VIEW CaptureFishProductionBanglaWithPopulation 
+print PSQL ("SET SEARCH_PATH to bangladesh;\n");
+
+print PSQL ("DROP VIEW  bangladesh.fish_capture_production_with_population CASCADE;\n");
+
+print PSQL ("CREATE VIEW bangladesh.fish_capture_production_with_population
   AS
 
 SELECT 
-  capture.species, 
-  capture.fishingarea, 
-  capture.measure, 
-  capture.quantity as weight,
-  capture.country,
-  population.quantity as population, 
-  population.year, 
-  population.unit, 
-  population.element, 
-  population.item
+  fish_capture.species, 
+  fish_capture.prodarea, 
+  fish_capture.measure, 
+  fish_capture.quantity as weight,
+  fish_capture.country,
+  socioecon_population.quantity as population, 
+  socioecon_population.year, 
+  socioecon_population.unit, 
+  socioecon_population.element, 
+  socioecon_population.item
 FROM 
-  fisheries.capture, 
-  resources.population
+  global.fish_capture, 
+  global.socioecon_population
 WHERE 
-  capture.measure = 'Quantity (tonnes)' AND 
-  capture.country = population.country AND
-  capture.country = 'Bangladesh' AND
-  capture.year    = population.year AND
-  population.element = 'Total Population - Both sexes'
+  fish_capture.measure = 'Quantity (tonnes)' AND 
+  fish_capture.country = socioecon_population.country AND
+  fish_capture.country = 'Bangladesh' AND
+  fish_capture.year    = socioecon_population.year AND
+  socioecon_population.element = 'Total Population - Both sexes'
 ORDER BY
-  capture.year ASC, 
-  capture.country ASC, 
-  capture.species ASC; \n");
+  fish_capture.year ASC, 
+  fish_capture.country ASC, 
+  fish_capture.species ASC; \n");
 
-print PSQL ("COMMENT ON VIEW CaptureFishProductionBanglaWithPopulation IS 'Capture fish production (weight and cash) in Bangladesh with human population information';\n");
+print PSQL ("COMMENT ON VIEW bangladesh.fish_capture_production_with_population IS 'Capture fish production (weight and cash) in Bangladesh with human population information'; \n");
+
 
 
 ### Sollies 
 
-print PSQL ("DROP VIEW  CaptureFishProductionSolomonWithPopulation CASCADE;\n");
+print PSQL ("SET SEARCH_PATH to Solomons;\n");
 
-print PSQL ("CREATE VIEW CaptureFishProductionSolomonWithPopulation 
+print PSQL ("DROP VIEW  solomons.fish_capture_production_with_population CASCADE;\n");
+
+print PSQL ("CREATE VIEW solomons.fish_capture_production_with_population
   AS
 
 SELECT 
-  capture.species, 
-  capture.fishingarea, 
-  capture.measure, 
-  capture.quantity as weight,
-  capture.country,
-  population.quantity as population, 
-  population.year, 
-  population.unit, 
-  population.element, 
-  population.item
+  fish_capture.species, 
+  fish_capture.prodarea, 
+  fish_capture.measure, 
+  fish_capture.quantity as weight,
+  fish_capture.country,
+  socioecon_population.quantity as population, 
+  socioecon_population.year, 
+  socioecon_population.unit, 
+  socioecon_population.element, 
+  socioecon_population.item
 FROM 
-  fisheries.capture, 
-  resources.population
+  global.fish_capture, 
+  global.socioecon_population
 WHERE 
-  capture.measure = 'Quantity (tonnes)' AND 
-  capture.country = population.country AND
-  capture.country = 'Solomon Islands' AND
-  capture.year    = population.year AND
-  population.element = 'Total Population - Both sexes'
+  fish_capture.measure = 'Quantity (tonnes)' AND 
+  fish_capture.country = socioecon_population.country AND
+  fish_capture.country = 'Solomon Islands' AND
+  fish_capture.year    = socioecon_population.year AND
+  socioecon_population.element = 'Total Population - Both sexes'
 ORDER BY
-  capture.year ASC, 
-  capture.country ASC, 
-  capture.species ASC; \n");
+  fish_capture.year ASC, 
+  fish_capture.country ASC, 
+  fish_capture.species ASC; \n");
 
-print PSQL ("COMMENT ON VIEW CaptureFishProductionSolomonWithPopulation IS 'Capture fish production (weight and cash) in Solomon Islands with human population information';\n");
+print PSQL ("COMMENT ON VIEW solomons.fish_capture_production_with_population IS 'Capture fish production (weight, tonnes) in Solomons with human population information'; \n");
 
 
 ### Cambodia 
 
-print PSQL ("DROP VIEW  CaptureFishProductionCambodiaWithPopulation CASCADE;\n");
+print PSQL ("SET SEARCH_PATH to cambodia;\n");
 
-print PSQL ("CREATE VIEW CaptureFishProductionCambodiaWithPopulation 
+print PSQL ("DROP VIEW  cambodia.fish_capture_production_with_population CASCADE;\n");
+
+print PSQL ("CREATE VIEW cambodia.fish_capture_production_with_population
   AS
 
 SELECT 
-  capture.species, 
-  capture.fishingarea, 
-  capture.measure, 
-  capture.quantity as weight,
-  capture.country,
-  population.quantity as population, 
-  population.year, 
-  population.unit, 
-  population.element, 
-  population.item
+  fish_capture.species, 
+  fish_capture.prodarea, 
+  fish_capture.measure, 
+  fish_capture.quantity as weight,
+  fish_capture.country,
+  socioecon_population.quantity as population, 
+  socioecon_population.year, 
+  socioecon_population.unit, 
+  socioecon_population.element, 
+  socioecon_population.item
 FROM 
-  fisheries.capture, 
-  resources.population
+  global.fish_capture, 
+  global.socioecon_population
 WHERE 
-  capture.measure = 'Quantity (tonnes)' AND 
-  capture.country = population.country AND
-  capture.country = 'Cambodia' AND
-  capture.year    = population.year AND
-  population.element = 'Total Population - Both sexes'
+  fish_capture.measure = 'Quantity (tonnes)' AND 
+  fish_capture.country = socioecon_population.country AND
+  fish_capture.country = 'Cambodia' AND
+  fish_capture.year    = socioecon_population.year AND
+  socioecon_population.element = 'Total Population - Both sexes'
 ORDER BY
-  capture.year ASC, 
-  capture.country ASC, 
-  capture.species ASC; \n");
+  fish_capture.year ASC, 
+  fish_capture.country ASC, 
+  fish_capture.species ASC; \n");
 
-print PSQL ("COMMENT ON VIEW CaptureFishProductionCambodiaWithPopulation IS 'Capture fish production (weight and cash) in Cambodia with human population information';\n");
+print PSQL ("COMMENT ON VIEW cambodia.fish_capture_production_with_population IS 'Capture fish production (weight, tonnes) in cambodia with human population information'; \n");
 
 
 ### Zambia 
 
-print PSQL ("DROP VIEW  CaptureFishProductionZambiaWithPopulation CASCADE;\n");
+print PSQL ("SET SEARCH_PATH to zambia;\n");
 
-print PSQL ("CREATE VIEW CaptureFishProductionZambiaWithPopulation 
+print PSQL ("DROP VIEW  zambia.fish_capture_production_with_population CASCADE;\n");
+
+print PSQL ("CREATE VIEW zambia.fish_capture_production_with_population
   AS
 
 SELECT 
-  capture.species, 
-  capture.fishingarea, 
-  capture.measure, 
-  capture.quantity as weight,
-  capture.country,
-  population.quantity as population, 
-  population.year, 
-  population.unit, 
-  population.element, 
-  population.item
+  fish_capture.species, 
+  fish_capture.prodarea, 
+  fish_capture.measure, 
+  fish_capture.quantity as weight,
+  fish_capture.country,
+  socioecon_population.quantity as population, 
+  socioecon_population.year, 
+  socioecon_population.unit, 
+  socioecon_population.element, 
+  socioecon_population.item
 FROM 
-  fisheries.capture, 
-  resources.population
+  global.fish_capture, 
+  global.socioecon_population
 WHERE 
-  capture.measure = 'Quantity (tonnes)' AND 
-  capture.country = population.country AND
-  capture.country = 'Zambia' AND
-  capture.year    = population.year AND
-  population.element = 'Total Population - Both sexes'
+  fish_capture.measure = 'Quantity (tonnes)' AND 
+  fish_capture.country = socioecon_population.country AND
+  fish_capture.country = 'Zambia' AND
+  fish_capture.year    = socioecon_population.year AND
+  socioecon_population.element = 'Total Population - Both sexes'
 ORDER BY
-  capture.year ASC, 
-  capture.country ASC, 
-  capture.species ASC; \n");
+  fish_capture.year ASC, 
+  fish_capture.country ASC, 
+  fish_capture.species ASC; \n");
 
-print PSQL ("COMMENT ON VIEW CaptureFishProductionZambiaWithPopulation IS 'Capture fish production (weight and cash) in Zambia with human population information';\n");
+print PSQL ("COMMENT ON VIEW zambia.fish_capture_production_with_population IS 'Capture fish production (weight, tonnes) in Zambia with human population information'; \n");
 
 
 ### Phillies 
 
-print PSQL ("DROP VIEW  CaptureFishProductionPhilippinesWithPopulation CASCADE;\n");
+print PSQL ("SET SEARCH_PATH to philippines;\n");
 
-print PSQL ("CREATE VIEW CaptureFishProductionPhilippinesWithPopulation 
+print PSQL ("DROP VIEW  philippines.fish_capture_production_with_population CASCADE;\n");
+
+print PSQL ("CREATE VIEW philippines.fish_capture_production_with_population
   AS
 
 SELECT 
-  capture.species, 
-  capture.fishingarea, 
-  capture.measure, 
-  capture.quantity as weight,
-  capture.country,
-  population.quantity as population, 
-  population.year, 
-  population.unit, 
-  population.element, 
-  population.item
+  fish_capture.species, 
+  fish_capture.prodarea, 
+  fish_capture.measure, 
+  fish_capture.quantity as weight,
+  fish_capture.country,
+  socioecon_population.quantity as population, 
+  socioecon_population.year, 
+  socioecon_population.unit, 
+  socioecon_population.element, 
+  socioecon_population.item
 FROM 
-  fisheries.capture, 
-  resources.population
+  global.fish_capture, 
+  global.socioecon_population
 WHERE 
-  capture.measure = 'Quantity (tonnes)' AND 
-  capture.country = population.country AND
-  capture.country = 'Philippines' AND
-  capture.year    = population.year AND
-  population.element = 'Total Population - Both sexes'
+  fish_capture.measure = 'Quantity (tonnes)' AND 
+  fish_capture.country = 'Philippines' AND socioecon_population.country = 'Philippines' AND
+  fish_capture.year    = socioecon_population.year AND
+  socioecon_population.element = 'Total Population - Both sexes'
 ORDER BY
-  capture.year ASC, 
-  capture.country ASC, 
-  capture.species ASC; \n");
+  fish_capture.year ASC, 
+  fish_capture.country ASC, 
+  fish_capture.species ASC; \n");
 
-print PSQL ("COMMENT ON VIEW CaptureFishProductionPhilippinesWithPopulation IS 'Capture fish production (weight and cash) in Philippines with human population information';\n");
+print PSQL ("COMMENT ON VIEW philippines.fish_capture_production_with_population IS 'Capture fish production (weight, tonnes) in Philippines with human population information'; \n");
 
 
+### Vietnam
+
+print PSQL ("SET SEARCH_PATH to vietnam;\n");
+
+print PSQL ("DROP VIEW  vietnam.fish_capture_production_with_population CASCADE;\n");
+
+print PSQL ("CREATE VIEW vietnam.fish_capture_production_with_population
+  AS
+
+SELECT 
+  fish_capture.species, 
+  fish_capture.prodarea, 
+  fish_capture.measure, 
+  fish_capture.quantity as weight,
+  fish_capture.country,
+  socioecon_population.quantity as population, 
+  socioecon_population.year, 
+  socioecon_population.unit, 
+  socioecon_population.element, 
+  socioecon_population.item
+FROM 
+  global.fish_capture, 
+  global.socioecon_population
+WHERE 
+  fish_capture.measure = 'Quantity (tonnes)' AND 
+  fish_capture.country = 'Viet Nam' AND socioecon_population.country = 'Viet Nam' AND
+  fish_capture.year    = socioecon_population.year AND
+  socioecon_population.element = 'Total Population - Both sexes'
+ORDER BY
+  fish_capture.year ASC, 
+  fish_capture.country ASC, 
+  fish_capture.species ASC; \n");
+
+print PSQL ("COMMENT ON VIEW vietnam.fish_capture_production_with_population IS 'Capture fish production (weight, tonnes) in Vietnam with human population information'; \n");
+
+
+
+
+
+
+
+
+
+
+#################################################################
 ############# Aquaculture by Country ############################
 
 ## East Timor
 
-print PSQL ("DROP VIEW   AquacultureProductionETimor  CASCADE;\n");
+print PSQL ("SET SEARCH_PATH to timorleste;\n");
 
-print PSQL ("CREATE VIEW AquacultureProductionETimor 
+print PSQL ("DROP VIEW   aqua_production_and_cash  CASCADE;\n");
+
+print PSQL ("CREATE VIEW aqua_production_and_cash
 AS
 
  SELECT  
-  aquaproduction.species, 
-  aquaproduction.fishingarea, 
-  aquaproduction.environment,
-  aquaproduction.country, 
-  aquaproduction.year, 
-  aquaproduction.quantity as weight,
-  aquavalue.quantity      as cash_value 
+  aqua_production.species, 
+  aqua_production.prodarea, 
+  aqua_production.environment,
+  aqua_production.country, 
+  aqua_production.year, 
+  aqua_production.quantity as weight,
+  aqua_value.quantity      as cash_value 
   
 FROM 
-  fisheries.aquaproduction,
-  fisheries.aquavalue 
+  global.aqua_production,
+  global.aqua_value 
 
 WHERE 
-  aquaproduction.country = 'Timor-Leste' 
+  aqua_production.country = 'Timor-Leste' AND aqua_value.country = 'Timor-Leste'
 ORDER BY
-  aquaproduction.year ASC, 
-  aquaproduction.country ASC, 
-  aquaproduction.species ASC ;\n");  
+  aqua_production.year ASC, 
+  aqua_production.country ASC, 
+  aqua_production.species ASC ;\n");  
  
  
- 
-print PSQL ("COMMENT ON VIEW AquacultureProductionETimor IS 'Aquaculture production (weight and cash) in East Timor';\n");
+print PSQL ("COMMENT ON VIEW aqua_production_and_cash IS 'Aquaculture production (weight and cash) in East Timor';\n");
 
 ## Bangladesh ## 
 
-print PSQL ("DROP VIEW   fisheries.AquacultureProductionBangladesh CASCADE;\n");
+print PSQL ("SET SEARCH_PATH to bangladesh;\n");
 
-print PSQL ("CREATE VIEW fisheries.AquacultureProductionBangledesh
+print PSQL ("DROP VIEW   aqua_production_and_cash  CASCADE;\n");
+
+print PSQL ("CREATE VIEW aqua_production_and_cash
 AS
-SELECT  
-  aquaproduction.species, 
-  aquaproduction.fishingarea, 
-  aquaproduction.environment,
-  aquaproduction.country, 
-  aquaproduction.year, 
-  aquaproduction.quantity as weight,
-  aquavalue.quantity      as cash_value  
+
+ SELECT  
+  aqua_production.species, 
+  aqua_production.prodarea, 
+  aqua_production.environment,
+  aqua_production.country, 
+  aqua_production.year, 
+  aqua_production.quantity as weight,
+  aqua_value.quantity      as cash_value 
+  
 FROM 
-  fisheries.aquaproduction,
-  fisheries.aquavalue 
+  global.aqua_production,
+  global.aqua_value 
 
 WHERE 
-  aquaproduction.country = 'Bangladesh' 
+  aqua_production.country = 'Bangladesh' AND aqua_value.country = 'Bangladesh'
 ORDER BY
-  aquaproduction.year ASC, 
-  aquaproduction.country ASC, 
-  aquaproduction.species ASC ;\n");  
+  aqua_production.year ASC, 
+  aqua_production.country ASC, 
+  aqua_production.species ASC ;\n");  
  
- print PSQL ("COMMENT ON VIEW AquacultureProductionBangladesh IS 'Aquaculture production (weight and cash) in Bangladesh';\n");
+ 
+ 
+print PSQL ("COMMENT ON VIEW aqua_production_and_cash IS 'Aquaculture production (weight and cash) in Bangladesh';\n");
 
+##### Cambodia ##########
 
+print PSQL ("SET SEARCH_PATH to cambodia;\n");
 
+print PSQL ("DROP VIEW   aqua_production_and_cash  CASCADE;\n");
+
+print PSQL ("CREATE VIEW aqua_production_and_cash
+AS
+
+ SELECT  
+  aqua_production.species, 
+  aqua_production.prodarea, 
+  aqua_production.environment,
+  aqua_production.country, 
+  aqua_production.year, 
+  aqua_production.quantity as weight,
+  aqua_value.quantity      as cash_value 
+  
+FROM 
+  global.aqua_production,
+  global.aqua_value 
+
+WHERE 
+  aqua_production.country = 'Cambodia' AND aqua_value.country = 'Cambodia'
+ORDER BY
+  aqua_production.year ASC, 
+  aqua_production.country ASC, 
+  aqua_production.species ASC ;\n");  
+ 
+ 
+ 
+print PSQL ("COMMENT ON VIEW aqua_production_and_cash IS 'Aquaculture production (weight and cash) in Cambodia';\n");
+
+##### Vietnam ##########
+
+print PSQL ("SET SEARCH_PATH to vietnam;\n");
+
+print PSQL ("DROP VIEW   aqua_production_and_cash  CASCADE;\n");
+
+print PSQL ("CREATE VIEW aqua_production_and_cash
+AS
+
+ SELECT  
+  aqua_production.species, 
+  aqua_production.prodarea, 
+  aqua_production.environment,
+  aqua_production.country, 
+  aqua_production.year, 
+  aqua_production.quantity as weight,
+  aqua_value.quantity      as cash_value 
+  
+FROM 
+  global.aqua_production,
+  global.aqua_value 
+
+WHERE 
+  aqua_production.country = 'Viet Nam' AND aqua_value.country = 'Viet Nam'
+ORDER BY
+  aqua_production.year ASC, 
+  aqua_production.country ASC, 
+  aqua_production.species ASC ;\n");  
+ 
+ 
+ 
+print PSQL ("COMMENT ON VIEW aqua_production_and_cash IS 'Aquaculture production (weight and cash) in Vietnam';\n");
 
 
 
