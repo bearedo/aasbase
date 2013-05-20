@@ -9,7 +9,7 @@ cd $DIR
 
 ## DROP TABLE if it exists
 
-# WorldOceans
+# Zambian Fishing Camps
 
 psql -d ${DB} -U postgres -c "DROP TABLE ${SCHEMA}.geo_zambia_gps_camps;"
 
@@ -18,13 +18,48 @@ psql -d ${DB} -U postgres -c "DROP TABLE ${SCHEMA}.geo_zambia_gps_camps;"
 psql -d ${DB} -U postgres -c "CREATE TABLE  ${SCHEMA}.geo_zambia_gps_camps(
 id int, 
 name varchar, 
-lat float4, 
-lon float4) WITH OIDS;"
+lat float, 
+lon float,
+stratum int,
+population int,
+year int,
+status varchar
+) WITH OIDS;"
 
+# Fill the Table
 
-psql -d ${DB} -U postgres -c "\COPY ${SCHEMA}.geo_zambia_gps_camps FROM '$DIR/Zambia_GPS_camps_Froukje.csv' WITH delimiter '|' CSV HEADER ;"
+psql -d ${DB} -U postgres -c "\COPY ${SCHEMA}.geo_zambia_gps_camps FROM '$DIR/Zambia_GPS_camps_Froukje_Mk2.csv' WITH delimiter ',' CSV HEADER NULL AS 'NA';"
+
+# Geometry type
+
 psql -d ${DB} -U postgres -c  "ALTER TABLE ${SCHEMA}.geo_zambia_gps_camps ADD COLUMN the_point geometry(Point,4326);"
 psql -d ${DB} -U postgres -c  "UPDATE  ${SCHEMA}.geo_zambia_gps_camps SET the_point = ST_SETSRID(ST_MAKEPOINT(lon,lat),4326);"
 
 
-psql -U postgres -d ${DB} -c "COMMENT ON TABLE ${SCHEMA}.geo_zambia_gps_camps IS 'Point locations for camps in Zambia from Froukje ';"
+# Geography type (all distances computed will be in meters)
+
+#psql -d ${DB} -U postgres -c  "ALTER TABLE ${SCHEMA}.geo_zambia_gps_camps ADD COLUMN the_geog geography(POINT,4326);"
+#psql -d ${DB} -U postgres -c  "UPDATE  ${SCHEMA}.geo_zambia_gps_camps SET the_geog = ST_GeogFRomText('SRID=4326;POINT(' || lon || ' ' || lat || ')');  "
+
+
+psql -U postgres -d ${DB} -c "COMMENT ON TABLE ${SCHEMA}.geo_zambia_gps_camps IS ' The gps data is for fishing camps in the Barotse floodplain, based on a recent Frame Survey implemented by the Zambian Department of Fisheries. Address further queries to Froukje Kruijssen';
+COMMENT ON COLUMN ${SCHEMA}.geo_zambia_gps_camps.name IS 'Name of the camp';
+COMMENT ON COLUMN ${SCHEMA}.geo_zambia_gps_camps.year IS 'Year camp was established';"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
