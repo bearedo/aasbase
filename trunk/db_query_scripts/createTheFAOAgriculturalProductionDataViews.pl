@@ -386,7 +386,27 @@ ORDER BY
 
 
 
+## View for Shwu Jiau to extract land use data for most current year (2011) ###  
+  
 
+print PSQL ("DROP VIEW global.agri_arable_land_2011 CASCADE;\n");
+
+print PSQL ("CREATE VIEW global.agri_arable_land_2011 
+AS
+SELECT  
+  *
+FROM 
+  global.agri_resources_land 
+WHERE 
+ global.agri_resources_land.year = 2011 
+AND
+ global.agri_resources_land.item = 'Arable land and Permanent crops'
+ORDER BY
+  country ASC;  
+
+\n");  
+ 
+ print PSQL ("COMMENT ON VIEW global.agri_arable_land_2011 IS 'FAO land use: arable land and permanent crops data 2011';\n");
 
 
 
