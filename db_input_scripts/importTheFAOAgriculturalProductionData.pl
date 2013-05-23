@@ -593,8 +593,8 @@ print PSQL ("CREATE TABLE socioecon_population (
  \n");
 
 print PSQL ("COMMENT ON TABLE socioecon_population IS 'These are FAOSTAT global human population statistics Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
-print PSQL ("COMMENT ON COLUMN resources.population.unit IS 'Unit quantity is measured in';\n");
-print PSQL ("COMMENT ON COLUMN resources.population.source_file  IS 'Name of the bulk download file';\n");
+print PSQL ("COMMENT ON COLUMN socioecon_population.unit IS 'Unit quantity is measured in';\n");
+print PSQL ("COMMENT ON COLUMN socioecon_population.source_file  IS 'Name of the bulk download file';\n");
 print PSQL ("\\COPY socioecon_population FROM '/srv/public/input_data_files/FAOSTAT/tmp/population-annualtimeseries7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
 ### Investment capital stock ####
@@ -886,7 +886,7 @@ print PSQL ("COMMENT ON COLUMN agri_emissions_fertilisers.unit IS 'Unit quantity
 print PSQL ("\\COPY agri_emissions_fertilisers FROM '/srv/public/input_data_files/FAOSTAT/tmp/emissions_agriculture_synthetic_fertilizers7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
 
-# Total emissions due to cropland
+# Total emissions due to crop
 
 print PSQL ("DROP TABLE agri_emissions_cropland; \n");
 
@@ -935,9 +935,85 @@ print PSQL ("\\COPY agri_emissions_forest FROM '/srv/public/input_data_files/FAO
 
 
 
+########################  Resources data  ####################################################
+
+## Land use ### 
+
+print PSQL ("DROP TABLE agri_resources_land; \n");
+
+print PSQL ("CREATE TABLE agri_resources_land (
+    country_code        integer,
+    country       varchar(72),
+    item_code     integer,
+    item         varchar(72),
+    element_group integer,
+    element_code   integer,
+    element        varchar(144),
+    year         integer,
+    unit         varchar(36),
+    quantity     float,
+    flag     varchar(2));
+
+ \n");
+
+print PSQL ("COMMENT ON TABLE agri_resources_land IS 'These are FAOSTAT agricultural land use data Afghanistan to Zim from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_resources_land.unit IS 'Unit quantity is measured in';\n");
+print PSQL ("\\COPY agri_resources_land FROM '/srv/public/input_data_files/FAOSTAT/tmp/resources-land7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+
+## Fertilizer Use 
+
+
+print PSQL ("DROP TABLE agri_resources_fertilizers; \n");
+
+print PSQL ("CREATE TABLE agri_resources_fertilizers (
+    country_code        integer,
+    country       varchar(72),
+    item_code     integer,
+    item         varchar(72),
+    element_group integer,
+    element_code   integer,
+    element        varchar(144),
+    year         integer,
+    unit         varchar(36),
+    quantity     float,
+    flag     varchar(2));
+
+ \n");
+
+print PSQL ("COMMENT ON TABLE agri_resources_fertilizers IS 'These are FAOSTAT agricultural fertilizer use data Afghanistan to Zim from the bulk download area
+ http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_resources_fertilizers.unit IS 'Unit quantity is measured in';\n");
+print PSQL ("\\COPY agri_resources_fertilizers FROM '/srv/public/input_data_files/FAOSTAT/tmp/resources-fertilizers7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_resources_fertilizers FROM '/srv/public/input_data_files/FAOSTAT/tmp/resources-fertilizersarchive7.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
 
 
+## Pesticide Use (consumption) 
+
+
+print PSQL ("DROP TABLE agri_resources_pesticides_consumption; \n");
+
+print PSQL ("CREATE TABLE agri_resources_pesticides_consumption (
+    country_code        integer,
+    country       varchar(72),
+    item_code     integer,
+    item         varchar(72),
+    element_group integer,
+    element_code   integer,
+    element        varchar(144),
+    year         integer,
+    unit         varchar(36),
+    quantity     float,
+    flag     varchar(2));
+
+ \n");
+
+#CountryCode|Country|ItemCode|Item|ElementGroup|ElementCode|Element|Year|Unit|Value|Flag
+
+print PSQL ("COMMENT ON TABLE agri_resources_pesticides_consumption IS 'These are FAOSTAT agricultural pesticide (consumption) data Afghanistan to Zim from the bulk download area
+ http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_resources_pesticides_consumption.unit IS 'Unit quantity is measured in';\n");
+print PSQL ("\\COPY agri_resources_pesticides_consumption FROM '/srv/public/input_data_files/FAOSTAT/tmp/resources-pesticidesconsumption6.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 
 
 
