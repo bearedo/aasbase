@@ -138,6 +138,7 @@ print PSQL ("DROP TABLE global.precipitation_tropics CASCADE; \n");
 
 print PSQL ("SELECT * INTO global.precipitation_tropics from global.precipitation where lat > -19 AND lat < 27;\n");
 print PSQL ("COMMENT ON TABLE global.precipitation_tropics IS 'These are global land precipitation data from GHCN for key tropical countries only';\n");
+
 print PSQL ("ALTER TABLE global.precipitation_tropics ADD COLUMN the_point geometry(Point,4326);\n");
 print PSQL ("UPDATE global.precipitation_tropics SET the_point = ST_SETSRID(ST_MAKEPOINT(lon,lat),4326);\n"); 
 

@@ -13,7 +13,17 @@ psql -d aas_base -U postgres -c "DROP TABLE ${SCHEMA}.geo_worldmap;"
 
 ## prepare the tables don't load data
 
-shp2pgsql -s 4326 -G -g the_geom_4326 -I -c -W "latin1" g2008_0 ${SCHEMA}.geo_worldmap  > geo_worldmap.sql 
+## Geography type
+
+#shp2pgsql -s 4326 -G -g the_geom_4326 -I -c -W "latin1" g2008_0 ${SCHEMA}.geo_worldmap  > geo_worldmap.sql 
+
+## Load the sql file into the database
+
+#psql -d aas_base -f geo_worldmap.sql -U postgres
+
+## Geometry type
+
+shp2pgsql -s 4326 -g the_geom_4326 -I -c -W "latin1" g2008_0 ${SCHEMA}.geo_worldmap  > geo_worldmap.sql 
 
 ## Load the sql file into the database
 
