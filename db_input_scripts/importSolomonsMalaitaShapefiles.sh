@@ -114,6 +114,28 @@ psql -d ${DB} -f geo_ward.sql -U postgres
 
 psql -U postgres -d ${DB} -c "COMMENT ON TABLE ${SCHEMA}.geo_ward_boundary IS 'Ward boundaries for Malaita Island from Solomons Office';"
 
+
+# Population projections for 2015 and 2013 per ward prepared by SJTeoh
+
+psql -d ${DB} -U postgres -c "DROP TABLE ${SCHEMA}.socioecon_ward_population_projection;"
+
+shp2pgsql -s 4326 -g the_geom_4326 -I -c -W "latin1" Ward_Population_Projection_clip ${SCHEMA}.socioecon_ward_population_projection > socioecon_ward_population_projection.sql 
+
+psql -d ${DB} -f socioecon_ward_population_projection.sql -U postgres
+
+psql -U postgres -d ${DB} -c "COMMENT ON TABLE ${SCHEMA}.socioecon_ward_population_projection IS 'Human population projections by ward in 2015 and 2030 from Landscan data for Malaita SIs';"
+
+
+
+
+
+
+
+
+
+
+
+
 ### RASTERS #######
 
 # Topography # 
