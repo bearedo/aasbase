@@ -7,6 +7,7 @@ CREATE SCHEMA tanzania;
 CREATE SCHEMA indonesia;
 CREATE SCHEMA fiji;
 CREATE SCHEMA coraltriangle;
+CREATE SCHEMA netherlands;
 
 
 
