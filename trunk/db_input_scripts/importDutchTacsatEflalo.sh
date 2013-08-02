@@ -17,3 +17,10 @@ psql -d ${DB} -f tacsat.sql -U postgres
 ## Change schema
 
 psql -U postgres -c "ALTER TABLE eflalo SET SCHEMA netherlands; ALTER TABLE tacsat SET SCHEMA netherlands;"
+
+### Add on geometry point ###
+
+print PSQL (" ALTER TABLE netherlands.tacsat ADD COLUMN the_point geometry(Point,4326);   \n");
+print PSQL (" UPDATE netherlands.tacsat SET the_point = ST_SETSRID(ST_MAKEPOINT(si_loni,si_lati),4326); \n"); 
+
+
