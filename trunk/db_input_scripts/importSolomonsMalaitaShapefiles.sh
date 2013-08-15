@@ -14,7 +14,6 @@ cd $DIR
 
 psql -d ${DB} -U postgres -c "DROP TABLE ${SCHEMA}.agri_crops;"
 
-shp2pgsql -s 4326 -g the_geom_4326 -I -c -W "latin1" M_CROPA ${SCHEMA}.agri_crops > agri_crops.sql 
 
 psql -d ${DB} -f agri_crops.sql -U postgres
 

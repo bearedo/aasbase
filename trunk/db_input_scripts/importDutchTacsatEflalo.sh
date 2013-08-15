@@ -20,7 +20,7 @@ psql -U postgres -c "ALTER TABLE eflalo SET SCHEMA netherlands; ALTER TABLE tacs
 
 ### Add on geometry point ###
 
-print PSQL (" ALTER TABLE netherlands.tacsat ADD COLUMN the_point geometry(Point,4326);   \n");
-print PSQL (" UPDATE netherlands.tacsat SET the_point = ST_SETSRID(ST_MAKEPOINT(si_loni,si_lati),4326); \n"); 
+psql -d ${DB} -U postgres -c "ALTER TABLE netherlands.tacsat ADD COLUMN the_point geometry(Point,4326);"
+psql -d ${DB} -U postgres -c "UPDATE netherlands.tacsat SET the_point = ST_SETSRID(ST_MAKEPOINT(si_long,si_lati),4326);" 
 
 

@@ -14,13 +14,13 @@ require "aas_db.pl";
 
 print PSQL ("SET SEARCH_PATH TO global; \n");
 
-print PSQL ("DROP TABLE global.icoads_gridded CASCADE; \n");
+print PSQL ("DROP TABLE global.clim_icoads_gridded CASCADE; \n");
 #
 ##print PSQL ("CREATE TABLESPACE dbspace LOCATION \'G://pGdata\'; \n");
 #
 #print PSQL ("SET default_tablespace = dbspace; \n");
 #
-print PSQL ("CREATE TABLE global.icoads_gridded (
+print PSQL ("CREATE TABLE global.clim_icoads_gridded (
 year int,
 month int,
 bsz int,
@@ -40,74 +40,71 @@ lat float,
 type varchar(12)) WITH OIDS;\n");
 
 
-print PSQL ("COMMENT ON TABLE  global.icoads_gridded IS 'These are global gridded data from ICOADs';\n");
-print PSQL ("COMMENT ON COLUMN global.icoads.gridded.year IS 'Year';\n");
-print PSQL ("COMMENT ON COLUMN global.icoads_gridded.month IS 'Month';\n");
-print PSQL ("COMMENT ON COLUMN global.icoads_gridded.bsz IS 'Box size: 1 = 1degree latitude x longitude 2 = 2degree latitude x longitude';\n");
-print PSQL ("COMMENT ON COLUMN global.icoads_gridded.blo IS 'box left (W) corner longitude (E)';\n");
-print PSQL ("COMMENT ON COLUMN global.icoads_gridded.bla IS 'box lower (S) corner latitude (+N, -S)';\n");
-print PSQL ("COMMENT ON COLUMN global.icoads_gridded.pid2 IS 'PID2: 0 = standard statistics (3.5 sigma trimming limits; ship data) 1 = enhanced statistics (4.5 sigma trimming limits; ship + other data)';\n");
-print PSQL ("COMMENT ON COLUMN global.icoads_gridded.M IS 'mean';\n");
-print PSQL ("COMMENT ON COLUMN global.icoads_gridded.N IS 'number of observations';\n");
-print PSQL ("COMMENT ON COLUMN global.icoads_gridded.S IS 'standard deviation';\n");
-print PSQL ("COMMENT ON COLUMN global.icoads_gridded.D IS 'mean day of month of the observations';\n");
-print PSQL ("COMMENT ON COLUMN global.icoads_gridded.HT IS 'fraction of observations in daylight';\n");
-print PSQL ("COMMENT ON COLUMN global.icoads_gridded.lon IS 'mean longitude of observations';\n");
-print PSQL ("COMMENT ON COLUMN global.icoads_gridded.lat IS 'mean latitude of observations';\n");
-print PSQL ("COMMENT ON COLUMN global.icoads_gridded.type IS 'type of data, e.g. SST=sea surface temperature';\n");
+print PSQL ("COMMENT ON TABLE  global.clim_icoads_gridded IS 'These are global gridded data from ICOADs';\n");
+print PSQL ("COMMENT ON COLUMN global.clim_icoads_gridded.year IS 'Year';\n");
+print PSQL ("COMMENT ON COLUMN global.clim_icoads_gridded.month IS 'Month';\n");
+print PSQL ("COMMENT ON COLUMN global.clim_icoads_gridded.bsz IS 'Box size: 1 = 1degree latitude x longitude 2 = 2degree latitude x longitude';\n");
+print PSQL ("COMMENT ON COLUMN global.clim_icoads_gridded.blo IS 'box left (W) corner longitude (E)';\n");
+print PSQL ("COMMENT ON COLUMN global.clim_icoads_gridded.bla IS 'box lower (S) corner latitude (+N, -S)';\n");
+print PSQL ("COMMENT ON COLUMN global.clim_icoads_gridded.pid2 IS 'PID2: 0 = standard statistics (3.5 sigma trimming limits; ship data) 1 = enhanced statistics (4.5 sigma trimming limits; ship + other data)';\n");
+print PSQL ("COMMENT ON COLUMN global.clim_icoads_gridded.M IS 'mean';\n");
+print PSQL ("COMMENT ON COLUMN global.clim_icoads_gridded.N IS 'number of observations';\n");
+print PSQL ("COMMENT ON COLUMN global.clim_icoads_gridded.S IS 'standard deviation';\n");
+print PSQL ("COMMENT ON COLUMN global.clim_icoads_gridded.D IS 'mean day of month of the observations';\n");
+print PSQL ("COMMENT ON COLUMN global.clim_icoads_gridded.HT IS 'fraction of observations in daylight';\n");
+print PSQL ("COMMENT ON COLUMN global.clim_icoads_gridded.lon IS 'mean longitude of observations';\n");
+print PSQL ("COMMENT ON COLUMN global.clim_icoads_gridded.lat IS 'mean latitude of observations';\n");
+print PSQL ("COMMENT ON COLUMN global.clim_icoads_gridded.type IS 'type of data, e.g. SST=sea surface temperature';\n");
 
 
 ## FILL THE TABLE
 ## SST data
 
-open(DATAFILE, "ls /srv/public/input_data_files/ICOADS-Global-Gridded/sst/tmp/*out |");
+open(DATAFILE, "ls /srv/public/input_data_files/ICOADS-Global-Gridded/sst/tmp/*database |");
 while(<DATAFILE>){
 s/^\s*(.*)\s*$/$1/;
 chomp;
 open(FILE,"<$_") or die "Cannot open file $_: $!\n";
-print PSQL ("\\COPY global.icoads_gridded FROM \'$_\' WITH delimiter \',\' null as \'-9999.00\'\n");
+print PSQL ("\\COPY global.clim_icoads_gridded FROM \'$_\' WITH delimiter \',\' null as \'-9999.00\'\n");
 print "IMPORTING: $_\n";}
 close(DATAFILE);
 
 ### AIRT
-#open(DATAFILE, "ls /srv/public/input_data_files/ICOADS-Global-Gridded/airtemp/tmp/*out |");
-#while(<DATAFILE>){
-#s/^\s*(.*)\s*$/$1/;
-#chomp;
-#open(FILE,"<$_") or die "Cannot open file $_: $!\n";
-#print PSQL ("\\COPY global.icoads_gridded FROM \'$_\' WITH delimiter \',\' null as \'-9999.00\'\n");
-#print "IMPORTING: $_\n";}
-#close(DATAFILE);
+open(DATAFILE, "ls /srv/public/input_data_files/ICOADS-Global-Gridded/airtemp/tmp/*database |");
+while(<DATAFILE>){
+s/^\s*(.*)\s*$/$1/;
+chomp;
+open(FILE,"<$_") or die "Cannot open file $_: $!\n";
+print PSQL ("\\COPY global.clim_icoads_gridded FROM \'$_\' WITH delimiter \',\' null as \'-9999.00\'\n");
+print "IMPORTING: $_\n";}
+close(DATAFILE);
 
 ### WINDSTRESS
-#open(DATAFILE, "ls /srv/public/input_data_files/ICOADS-Global-Gridded/windstress/tmp/*out |");
-#while(<DATAFILE>){
-#s/^\s*(.*)\s*$/$1/;
-#chomp;
-#open(FILE,"<$_") or die "Cannot open file $_: $!\n";
-#print PSQL ("\\COPY global.icoads_gridded FROM \'$_\' WITH delimiter \',\' null as \'-9999.00\'\n");
-#print "IMPORTING: $_\n";}
-#close(DATAFILE);
+open(DATAFILE, "ls /srv/public/input_data_files/ICOADS-Global-Gridded/windstress/tmp/*database |");
+while(<DATAFILE>){
+s/^\s*(.*)\s*$/$1/;
+chomp;
+open(FILE,"<$_") or die "Cannot open file $_: $!\n";
+print PSQL ("\\COPY global.clim_icoads_gridded FROM \'$_\' WITH delimiter \',\' null as \'-9999.00\'\n");
+print "IMPORTING: $_\n";}
+close(DATAFILE);
 
 
+print PSQL ("ALTER TABLE global.clim_icoads_gridded ADD PRIMARY KEY (year,month,blo,bla);\n");
+##
+### Create indices ###
 
-print PSQL ("ALTER TABLE global.icoads_gridded ADD PRIMARY KEY (year,month,blo,bla);\n");
-#
-## Create indices ###
+print PSQL ("CREATE INDEX icoads_gridded_month ON global.clim_icoads_gridded (month);\n");
+print PSQL ("CREATE INDEX icoads_gridded_year ON global.clim_icoads_gridded (year);\n");
+print PSQL ("CREATE INDEX icoads_gridded_lat ON global.clim_icoads_gridded (lat);\n");
+print PSQL ("CREATE INDEX icoads_gridded_lon ON global.clim_icoads_gridded (lon);\n");
 
-print PSQL ("CREATE INDEX icoads_gridded_month ON global.icoads_gridded (month);\n");
-print PSQL ("CREATE INDEX icoads_gridded_year ON global.icoads_gridded (year);\n");
-print PSQL ("CREATE INDEX icoads_gridded_lat ON global.icoads_gridded (lat);\n");
-print PSQL ("CREATE INDEX icoads_gridded_lon ON global.icoads_gridded (lon);\n");
-
-### Add on geometry point ###
+#### Add on geometry point ###
 
 print PSQL ("SET SEARCH_PATH to public;\n");
-print PSQL ("SELECT addgeometrycolumn('','global','icoads_gridded','the_point',4326,'POINT',2);\n");
-print PSQL ("UPDATE global.icoads_gridded SET the_point = GeomFromEWKT('SRID=4326;POINT(' || icoads_gridded.lon || ' ' || icoads_gridded.lat || ')');\n");
-print PSQL ("CREATE INDEX icoads_gridded_the_point ON global.icoads_gridded USING GIST (the_point);\n");
-
-
+print PSQL ("SELECT addgeometrycolumn('','global','clim_icoads_gridded','the_point',4326,'POINT',2);\n");
+print PSQL ("UPDATE global.clim_icoads_gridded SET the_point = GeomFromEWKT('SRID=4326;POINT(' || clim_icoads_gridded.lon || ' ' || clim_icoads_gridded.lat || ')');\n");
+print PSQL ("CREATE INDEX clim_icoads_gridded_the_point ON global.clim_icoads_gridded USING GIST (the_point);\n");
 
 
 
