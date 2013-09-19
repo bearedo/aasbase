@@ -20,7 +20,6 @@ GROUP BY year, month, country ORDER BY year,month, country
  ;
 COMMENT ON TABLE global.clim_icoads_world_eez_mth_yr IS 'These are global historic marine surface sea surface and air temperature data from icoads aggregated (means) 
 over year, month, & EEZ. See (www.cdc.noaa.gov)';
-
 "
 
 ## Aggregate EEZ data by year and country
