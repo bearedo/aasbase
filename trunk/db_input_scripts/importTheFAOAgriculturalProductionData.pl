@@ -19,6 +19,69 @@ require "aas_db.pl";
 
 print PSQL ("SET SEARCH_PATH TO global; \n");
 
+
+### Prodstat crops #####################
+
+print PSQL ("DROP TABLE agri_prodstat_crops; \n");
+
+print PSQL ("CREATE TABLE agri_prodstat_crops (
+    country_code        integer,
+    country       varchar(72),
+    item_code     varchar(12),
+    item         varchar(72),
+    element_group   integer,
+    element_code       varchar(24),
+    element      varchar(24),
+unit varchar(12),
+    year         integer,
+    quantity float); \n");
+
+print PSQL ("COMMENT ON TABLE agri_prodstat_crops IS 'These are FAOSTAT crop production data Afghanistan to Zimbabwe from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
+print PSQL ("COMMENT ON COLUMN agri_prodstat_crops_processed.unit IS 'Unit crop quantity is measured in';\n");
+print PSQL ("\\COPY agri_prodstat_crops FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_production-crops1.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_prodstat_crops FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_production-crops2.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_prodstat_crops FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_production-crops3.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_prodstat_crops FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_production-crops4.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_prodstat_crops FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_production-crops5.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+print PSQL ("\\COPY agri_prodstat_crops FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_production-crops6.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
+
+
+
+# Add on UN georegions and economic groupings
+
+print PSQL ("ALTER TABLE agri_prodstat_crops_processed ADD COLUMN region varchar(36);\n");
+print PSQL ("UPDATE agri_prodstat_crops_processed 
+SET region = geo_regions.region
+FROM geo_regions
+WHERE agri_prodstat_crops_processed.country = geo_regions.country;  \n");
+
+
+print PSQL ("ALTER TABLE agri_prodstat_crops_processed ADD COLUMN continent varchar(36);\n");
+print PSQL ("UPDATE agri_prodstat_crops_processed 
+SET continent = geo_regions.continent
+FROM geo_regions
+WHERE agri_prodstat_crops_processed.country = geo_regions.country;  \n");
+
+
+print PSQL ("ALTER TABLE agri_prodstat_crops_processed ADD COLUMN economic_status varchar(36);\n");
+print PSQL ("UPDATE agri_prodstat_crops_processed 
+SET economic_status = socioecon_groupings.economic_status
+FROM socioecon_groupings
+WHERE agri_prodstat_crops_processed.country = socioecon_groupings.country;  \n");
+
+
+
+
+
+
+
+
+
+
+
+
+### Prodstat crops processed #####################
+
 print PSQL ("DROP TABLE agri_prodstat_crops_processed; \n");
 
 print PSQL ("CREATE TABLE agri_prodstat_crops_processed (
