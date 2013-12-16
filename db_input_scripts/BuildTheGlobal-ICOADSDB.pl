@@ -161,6 +161,46 @@ print PSQL ("UPDATE global.clim_icoads_world_2000_present SET the_point = ST_SET
 
 print PSQL ("CREATE INDEX icoads_world_2000_present_the_point ON global.clim_icoads_world_2000_present USING GIST (the_point);\n");
 
+### Create proper timestamp from yr, mo, dy etc. ###
+
+
+psql -d aas_base -U postgres -c "SET SEARCH_PATH to global; UPDATE global.clim_icoads_world_2000_present SET timestamp = (yr || '-' || mo  || '-' || dy )::timestamp; 
+ALTER TABLE global.clim_icoads_world_1990_1999 ADD COLUMN timestamp timestamp;
+UPDATE global.clim_icoads_world_1990_1999 SET timestamp = (yr || '-' || mo  || '-' || dy )::timestamp;
+ALTER TABLE global.clim_icoads_world_1970_1989 ADD COLUMN timestamp timestamp;
+UPDATE global.clim_icoads_world_1970_1989 SET timestamp = (yr || '-' || mo  || '-' || dy )::timestamp;
+
+ALTER TABLE global.clim_icoads_world_1950_1969 ADD COLUMN timestamp timestamp;
+UPDATE global.clim_icoads_world_1950_1969 SET timestamp = (yr || '-' || mo  || '-' || dy )::timestamp;
+ALTER TABLE global.clim_icoads_world_1900_1949 ADD COLUMN timestamp timestamp;
+UPDATE global.clim_icoads_world_1900_1949 SET timestamp = (yr || '-' || mo  || '-' || dy )::timestam;
+ALTER TABLE global.clim_icoads_world_1664_1899 ADD COLUMN timestamp timestamp;
+UPDATE global.clim_icoads_1664_1899 SET timestamp = (yr || '-' || mo  || '-' || dy )::timestamp;"
+
+
+## Data for Niels Hintzen
+
+#COPY (SELECT yr,mo, dy, hr, lat, lon, slp, at, w, sst, wd, wp, wh from clim_icoads_world_1664_1899 WHERE lon >= -10 AND lon <= 10 AND lat >=45 AND lat <=70) TO '/srv/public/1664-1899.csv'  DELIMITER ',' CSV HEADER;
+
+#psql -U postgres -d aas_base -c "SET SEARCH_PATH TO global; COPY (SELECT yr,mo, dy, hr, lat, lon, slp, at, w, sst, wd, wp, wh from clim_icoads_world_1900_1949 WHERE lon >= -10 AND lon <= 10 AND lat >=45 AND lat <=70) TO '/srv/public/1900-1949.csv'  DELIMITER ',' CSV HEADER;
+#COPY (SELECT yr,mo, dy, hr, lat, lon, slp, at, w, sst, wd, wp, wh from clim_icoads_world_1950_1969 WHERE lon >= -10 AND lon <= 10 AND lat >=45 AND lat <=70) TO '/srv/public/1950-1969.csv'  DELIMITER ',' CSV HEADER;
+#COPY (SELECT yr,mo, dy, hr, lat, lon, slp, at, w, sst, wd, wp, wh from clim_icoads_world_1970_1989 WHERE lon >= -10 AND lon <= 10 AND lat >=45 AND lat <=70) TO '/srv/public/1970-1989.csv'  DELIMITER ',' CSV HEADER;
+#COPY (SELECT yr,mo, dy, hr, lat, lon, slp, at, w, sst, wd, wp, wh from clim_icoads_world_1990_1999 WHERE lon >= -10 AND lon <= 10 AND lat >=45 AND lat <=70) TO '/srv/public/1990-1999.csv'  DELIMITER ',' CSV HEADER;
+#COPY (SELECT yr,mo, dy, hr, lat, lon, slp, at, w, sst, wd, wp, wh from clim_icoads_world_2000_present WHERE lon >= -10 AND lon <= 10 AND lat >=45 AND lat <=70) TO '/srv/public/2000-present.csv'  DELIMITER ',' CSV HEADER;"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #print "Converting lat/lon position into ICES stat square\n";
