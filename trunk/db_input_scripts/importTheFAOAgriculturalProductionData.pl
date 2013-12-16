@@ -37,7 +37,7 @@ unit varchar(12),
     quantity float); \n");
 
 print PSQL ("COMMENT ON TABLE agri_prodstat_crops IS 'These are FAOSTAT crop production data Afghanistan to Zimbabwe from the bulk download area http://faostat.fao.org/site/491/default.aspx ';\n"); 
-print PSQL ("COMMENT ON COLUMN agri_prodstat_crops_processed.unit IS 'Unit crop quantity is measured in';\n");
+print PSQL ("COMMENT ON COLUMN agri_prodstat_crops.unit IS 'Unit crop quantity is measured in';\n");
 print PSQL ("\\COPY agri_prodstat_crops FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_production-crops1.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 print PSQL ("\\COPY agri_prodstat_crops FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_production-crops2.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
 print PSQL ("\\COPY agri_prodstat_crops FROM '/srv/public/input_data_files/FAOSTAT/tmp/Relational_production-crops3.csv.txt' WITH DELIMITER '|' null as 'NA' CSV header \n"); 
@@ -49,25 +49,25 @@ print PSQL ("\\COPY agri_prodstat_crops FROM '/srv/public/input_data_files/FAOST
 
 # Add on UN georegions and economic groupings
 
-print PSQL ("ALTER TABLE agri_prodstat_crops_processed ADD COLUMN region varchar(36);\n");
-print PSQL ("UPDATE agri_prodstat_crops_processed 
+print PSQL ("ALTER TABLE agri_prodstat_crops ADD COLUMN region varchar(36);\n");
+print PSQL ("UPDATE agri_prodstat_crops
 SET region = geo_regions.region
 FROM geo_regions
-WHERE agri_prodstat_crops_processed.country = geo_regions.country;  \n");
+WHERE agri_prodstat_crops.country = geo_regions.country;  \n");
 
 
-print PSQL ("ALTER TABLE agri_prodstat_crops_processed ADD COLUMN continent varchar(36);\n");
-print PSQL ("UPDATE agri_prodstat_crops_processed 
+print PSQL ("ALTER TABLE agri_prodstat_crops ADD COLUMN continent varchar(36);\n");
+print PSQL ("UPDATE agri_prodstat_crops 
 SET continent = geo_regions.continent
 FROM geo_regions
-WHERE agri_prodstat_crops_processed.country = geo_regions.country;  \n");
+WHERE agri_prodstat_crops.country = geo_regions.country;  \n");
 
 
-print PSQL ("ALTER TABLE agri_prodstat_crops_processed ADD COLUMN economic_status varchar(36);\n");
-print PSQL ("UPDATE agri_prodstat_crops_processed 
+print PSQL ("ALTER TABLE agri_prodstat_crops ADD COLUMN economic_status varchar(36);\n");
+print PSQL ("UPDATE agri_prodstat_crops 
 SET economic_status = socioecon_groupings.economic_status
 FROM socioecon_groupings
-WHERE agri_prodstat_crops_processed.country = socioecon_groupings.country;  \n");
+WHERE agri_prodstat_crops.country = socioecon_groupings.country;  \n");
 
 
 
