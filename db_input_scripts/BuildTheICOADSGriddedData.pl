@@ -93,8 +93,11 @@ close(DATAFILE);
 print PSQL ("ALTER TABLE global.clim_icoads_gridded ADD PRIMARY KEY (year,month,blo,bla);\n")
 
 print PSQL ("UPDATE global.clim_icoads_gridded SET lon = blo+lon;\n")
-print PSQL ("UPDATE global.clim_icoads_gridded SET lon = lon-360 WHERE lon > 180 AND type= 'SST';\n")
-print PSQL ("UPDATE global.clim_icoads_gridded SET lon = lon-360 WHERE lon > 180 AND type= 'AIRT';\n")
+print PSQL ("UPDATE global.clim_icoads_gridded SET lon = lon-360 WHERE lon > 180 AND type= 'SST';
+UPDATE global.clim_icoads_gridded SET lon = lon-360 WHERE lon > 180 AND type= 'AIRT';
+
+
+\n")
 
 
 
