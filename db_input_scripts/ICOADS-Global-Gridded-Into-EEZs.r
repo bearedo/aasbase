@@ -69,7 +69,7 @@ grid[grid$yr==2009 & grid$mo == 10,]
 
 
 sqlQuery(conn,"SET SEARCH_PATH TO global")
-#sqlQuery(conn,"DROP TABLE clim_icoads_world_eez;")
+#sqlQuery(conn,"DROP TABLE global.clim_icoads_world_gridded_eez;")
 #sqlQuery(conn,"DELETE FROM clim_icoads_world_eez WHERE extract(year from timestamp) = 2009;")
 
 
@@ -81,7 +81,7 @@ sqlQuery(conn,"SET SEARCH_PATH TO global")
 ##################################################
 ##################################################
 
-for (i in 1:length(grid[,1])) 
+for (i in 1331:length(grid[,1])) 
 
 {
 
