@@ -248,7 +248,7 @@ print(i)
   if (i == 1 & !is.null(out))
    {
    #sqlQuery(conn,"DROP TABLE global.clim_icoads_world_eez;")
-    sqlQuery(conn,"set search_path to global;")
+   sqlQuery(conn,"set search_path to global;")
    sqlSave(conn,out,tablename='clim_icoads_world_eez',append=F,rownames=FALSE,addPK=TRUE,fast=TRUE,varTypes=c(timestamp="timestamp"),nastring='NA')
    print('Created database')
    
