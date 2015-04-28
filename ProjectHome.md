@@ -1,0 +1,1 @@
+Aquatic Agricultural Systems is a program of the CG network and WorldFish is the lead center. WorldFish maintains a spatial (postgis) database to hold geographic data relevant to these systems in our key countries of interest. This project provides a subversion control system for maintaining scripts which import data and create queries etc.
